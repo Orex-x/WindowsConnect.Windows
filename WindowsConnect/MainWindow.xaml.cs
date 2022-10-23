@@ -15,6 +15,13 @@ using System.Media;
 using System.Runtime.InteropServices;
 using WindowsConnect.Services;
 using WindowsConnect.Interfaces;
+using WindowsConnect.Models;
+using AudioSwitcher.AudioApi;
+using Device = WindowsConnect.Models.Device;
+using System.Collections.ObjectModel;
+using System.Windows.Threading;
+using System.Windows.Forms;
+using Application = System.Windows.Forms.Application;
 
 namespace WindowsConnect
 {
@@ -22,6 +29,8 @@ namespace WindowsConnect
     {
         private UDPClientService _udpClient;
         private VolumeService _volumeService;
+        private ObservableCollection<Device> _device = new ObservableCollection<Device>();
+
 
         protected override void OnClosed(EventArgs e)
         {
@@ -34,9 +43,23 @@ namespace WindowsConnect
             _volumeService.setVolume(volume);
         }
 
+        public void addDevice(Device device)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                _device.Add(device);
+            }));
+        }
+
+        public void sleep()
+        {
+            Application.SetSuspendState(PowerState.Hibernate, false, false);
+        }
+
         public MainWindow()
         {
             InitializeComponent();
+            Devices.ItemsSource = _device;
             _udpClient = new UDPClientService(BootService._port, this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();

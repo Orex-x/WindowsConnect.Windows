@@ -1,7 +1,6 @@
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\WindowsConnect.exe.config
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\WindowsConnect.exe
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\WindowsConnect.pdb
-C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\QRCoder.dll
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnect.csproj.AssemblyReference.cache
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnect.csproj.SuggestedBindingRedirects.cache
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\MainWindow.g.cs
@@ -16,7 +15,6 @@ C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnec
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnect.csproj.CopyComplete
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnect.exe
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnect.pdb
-C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\Newtonsoft.Json.dll
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\Newtonsoft.Json.xml
-C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\AudioSwitcher.AudioApi.CoreAudio.dll
-C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\AudioSwitcher.AudioApi.dll
+C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\System.Diagnostics.DiagnosticSource.xml
+C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnect.csproj.Fody.CopyLocal.cache

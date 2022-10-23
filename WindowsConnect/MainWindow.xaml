@@ -14,5 +14,17 @@
         <Grid Grid.Column="1">
             <Image x:Name="imgQRCode" Width="200" Height="200" VerticalAlignment="Top" Margin="20"/>
         </Grid>
+
+        <Grid Grid.Column="0">
+            <ListBox x:Name="Devices">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="5">
+                            <TextBlock FontSize="16" Text="{Binding Path=Name}" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
     </Grid>
 </Window>

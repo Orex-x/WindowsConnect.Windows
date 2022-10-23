@@ -11,20 +11,42 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using Newtonsoft.Json.Linq;
 using QRCoder;
+using System.Net.NetworkInformation;
 
 namespace WindowsConnect.Services
 {
     public class QRCodeService
     {
+
+        public static string GetMACAddress()
+        {
+            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+            string sMacAddress = string.Empty;
+            IPInterfaceProperties properties = nics[0].GetIPProperties();
+            sMacAddress = nics[0].GetPhysicalAddress().ToString();
+
+            int y = 0;
+            for(int i = 1; i<=5; i++, y++)
+            {
+                sMacAddress = sMacAddress.Insert(i*2 + y, ":");
+            }
+
+            return sMacAddress;
+        }
+
+
         public static BitmapImage getQRCode()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
             var hostIP = host.AddressList.ToList()
                 .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
+
+
             var json = new JObject();
             json["port"] = BootService._port;
             json["ip"] = hostIP.ToString();
             json["name"] = host.HostName;
+            json["macAddress"] = GetMACAddress();
             string jsonString = json.ToString();
 
 

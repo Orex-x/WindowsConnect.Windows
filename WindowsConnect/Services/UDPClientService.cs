@@ -1,14 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using WindowsConnect.Interfaces;
+using WindowsConnect.Models;
 
 namespace WindowsConnect.Services
 {
@@ -53,6 +50,18 @@ namespace WindowsConnect.Services
                             case "changeVolume":
                                 int volume = jsonObj["value"];
                                 _commandController.setVolume(volume);
+                                break;
+                            case "sleep":
+                                _commandController.sleep();
+                                break;
+                            case "addDevice":
+                                dynamic value = jsonObj["value"];
+                                var device = new Device()
+                                {
+                                    Name = value["Name"],
+                                    DateConnect = DateTime.Now
+                                };
+                                _commandController.addDevice(device);
                                 break;
                             default:
                                 
