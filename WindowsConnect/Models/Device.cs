@@ -5,7 +5,7 @@ namespace WindowsConnect.Models
 {
     public class Device : INotifyPropertyChanged
     {
-        public string _name;
+        private string _name;
 
         public string Name
         {
@@ -17,7 +17,30 @@ namespace WindowsConnect.Models
             }
         }
 
-        public DateTime _dateConnect;
+        private string _ip;
+        public string IP
+        {
+            get { return _ip; }
+            set
+            {
+                _ip = value;
+                OnPropertyChanged("IP");
+            }
+        }
+
+        private int _port;
+        public int Port
+        {
+            get { return _port; }
+            set
+            {
+                _port = value;
+                OnPropertyChanged("Port");
+            }
+        }
+
+
+        private DateTime _dateConnect;
 
         public DateTime DateConnect
         {

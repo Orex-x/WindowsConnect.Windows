@@ -207,8 +207,10 @@
     </ApplicationDefinition>
     <Compile Include="Interfaces\ICommandController.cs" />
     <Compile Include="Models\Device.cs" />
-    <Compile Include="Services\BootService.cs" />
+    <Compile Include="Services\CommandHelper.cs" />
+    <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\QRCodeService.cs" />
+    <Compile Include="Services\TCPClientService.cs" />
     <Compile Include="Services\UDPClientService.cs" />
     <Compile Include="Services\VolumeService.cs" />
     <Page Include="MainWindow.xaml">

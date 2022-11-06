@@ -17,46 +17,14 @@ namespace WindowsConnect.Services
 {
     public class QRCodeService
     {
-
-        public static string GetMACAddress()
-        {
-            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
-            string sMacAddress = string.Empty;
-            IPInterfaceProperties properties = nics[0].GetIPProperties();
-            sMacAddress = nics[0].GetPhysicalAddress().ToString();
-
-            int y = 0;
-            for(int i = 1; i<=5; i++, y++)
-            {
-                sMacAddress = sMacAddress.Insert(i*2 + y, ":");
-            }
-
-            return sMacAddress;
-        }
-
-
         public static BitmapImage getQRCode()
         {
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-            var hostIP = host.AddressList.ToList()
-                .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
-
-
-            var json = new JObject();
-            json["port"] = BootService._port;
-            json["ip"] = hostIP.ToString();
-            json["name"] = host.HostName;
-            json["macAddress"] = GetMACAddress();
-            string jsonString = json.ToString();
-
-
             var qrGenerator = new QRCodeGenerator();
-            var qrCodeData = qrGenerator.CreateQrCode(jsonString, QRCodeGenerator.ECCLevel.Q);
+            var qrCodeData = qrGenerator.CreateQrCode(SettingsService.getHostInfo().ToString(), QRCodeGenerator.ECCLevel.Q);
             var qrCode = new QRCode(qrCodeData);
             var qrCodeImage = qrCode.GetGraphic(20);
 
             return ToBitmapImage(qrCodeImage);
-
         }
 
 

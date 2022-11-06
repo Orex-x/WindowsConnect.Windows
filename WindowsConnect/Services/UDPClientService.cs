@@ -1,9 +1,12 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Drawing;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 using WindowsConnect.Interfaces;
 using WindowsConnect.Models;
 
@@ -32,6 +35,22 @@ namespace WindowsConnect.Services
             _receiver.Close();
         }
 
+        public static void SendMessage(byte[] data, string ip, int port)
+        {
+            var udp = new UdpClient();
+            udp.Send(data, data.Length, ip, port);
+            udp.Close();
+        } 
+        
+        public static void SendMessage(string message, string ip, int port)
+        {
+            var data = Encoding.UTF8.GetBytes(message);
+            var udp = new UdpClient();
+            udp.Send(data, data.Length, ip, port);
+            udp.Close();
+        }
+
+
         private void ReceiveMessage()
         {
             IPEndPoint remoteIp = null;
@@ -45,6 +64,10 @@ namespace WindowsConnect.Services
                     {
                         dynamic jsonObj = JsonConvert.DeserializeObject(message);
                         string command = jsonObj["command"];
+
+                        dynamic value = null;
+                        Device device = null;
+
                         switch (command)
                         {
                             case "changeVolume":
@@ -55,13 +78,26 @@ namespace WindowsConnect.Services
                                 _commandController.sleep();
                                 break;
                             case "addDevice":
-                                dynamic value = jsonObj["value"];
-                                var device = new Device()
+                                value = jsonObj["value"];
+                                device = new Device()
                                 {
                                     Name = value["Name"],
+                                    IP = value["IP"],
+                                    Port = SettingsService.ClientPort,
                                     DateConnect = DateTime.Now
                                 };
                                 _commandController.addDevice(device);
+                                break;
+                            case "requestAddDevice":
+                                value = jsonObj["value"];
+                                device = new Device()
+                                {
+                                    Name = value["Name"],
+                                    IP = value["IP"],
+                                    Port = SettingsService.ClientPort,
+                                    DateConnect = DateTime.Now
+                                };
+                                _commandController.requestAddDevice(device);
                                 break;
                             default:
                                 

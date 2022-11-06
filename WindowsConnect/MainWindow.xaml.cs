@@ -1,27 +1,16 @@
-﻿using Newtonsoft.Json.Linq;
-using QRCoder;
-using System;
-using System.Drawing;
-using System.Drawing.Imaging;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using System.Windows;
-using System.Windows.Media.Imaging;
-using System.Media;
-using System.Runtime.InteropServices;
 using WindowsConnect.Services;
 using WindowsConnect.Interfaces;
-using WindowsConnect.Models;
-using AudioSwitcher.AudioApi;
 using Device = WindowsConnect.Models.Device;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
-using System.Windows.Forms;
 using Application = System.Windows.Forms.Application;
+using System.Windows.Forms;
+using MessageBox = System.Windows.MessageBox;
+using System.Threading.Tasks;
+using System.Collections;
 
 namespace WindowsConnect
 {
@@ -43,26 +32,60 @@ namespace WindowsConnect
             _volumeService.setVolume(volume);
         }
 
-        public void addDevice(Device device)
+        public async void addDevice(Device device)
         {
             Dispatcher.Invoke(new Action(() =>
             {
-                _device.Add(device);
+                var result = MessageBox.Show($"Устройство {device.Name} запрашевает подключение.\n " +
+                    $"Подключить данное устройство?", "Добавление устройства", MessageBoxButton.YesNo);
+                if(result == MessageBoxResult.Yes)
+                {
+                    _device.Add(device);
+                }
             }));
+            sendWallpaper(device);
         }
+        private void sendWallpaper(Device device)
+        {
+            try
+            {
+                var path =
+                Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "Microsoft\\Windows\\Themes\\TranscodedWallpaper");
+
+                byte[] bytes = File.ReadAllBytes(path);
+                
+                var command = CommandHelper.createCommand(Command.setWallpaper, bytes);
+
+                TCPClientService.SendMessage(command, device.IP, device.Port);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+        }
+
 
         public void sleep()
         {
             Application.SetSuspendState(PowerState.Hibernate, false, false);
         }
 
+        public void requestAddDevice(Device device)
+        {
+            var command = CommandHelper.createCommand(Command.setHostInfo, SettingsService.getHostInfo());
+            UDPClientService.SendMessage(command, device.IP, device.Port);
+        }
+
         public MainWindow()
         {
             InitializeComponent();
             Devices.ItemsSource = _device;
-            _udpClient = new UDPClientService(BootService._port, this);
+            _udpClient = new UDPClientService(SettingsService.HostPort, this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
+
         }
     }
 }
