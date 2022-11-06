@@ -11,6 +11,8 @@ using System.Windows.Forms;
 using MessageBox = System.Windows.MessageBox;
 using System.Threading.Tasks;
 using System.Collections;
+using System.Media;
+using System.Reflection;
 
 namespace WindowsConnect
 {
@@ -78,6 +80,12 @@ namespace WindowsConnect
             UDPClientService.SendMessage(command, device.IP, device.Port);
         }
 
+        public void playStepasSound()
+        {
+            var player = new SoundPlayer($"{Environment.CurrentDirectory}\\res\\stepas_sound.wav");
+            player.Play();
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -85,7 +93,6 @@ namespace WindowsConnect
             _udpClient = new UDPClientService(SettingsService.HostPort, this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
-
         }
     }
 }

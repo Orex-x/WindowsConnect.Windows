@@ -18,3 +18,5 @@ C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnec
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\Newtonsoft.Json.xml
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\System.Diagnostics.DiagnosticSource.xml
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnect.csproj.Fody.CopyLocal.cache
+C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnect_Content.g.cs
+C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\res\stepas_sound.wav

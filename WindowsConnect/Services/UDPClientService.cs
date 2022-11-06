@@ -77,6 +77,9 @@ namespace WindowsConnect.Services
                             case "sleep":
                                 _commandController.sleep();
                                 break;
+                            case "playStepasSound":
+                                _commandController.playStepasSound();
+                                break;
                             case "addDevice":
                                 value = jsonObj["value"];
                                 device = new Device()

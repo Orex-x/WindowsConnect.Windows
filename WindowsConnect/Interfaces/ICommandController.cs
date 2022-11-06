@@ -12,7 +12,7 @@ namespace WindowsConnect.Interfaces
         void setVolume(int volume);
         void addDevice(Device device);
         void sleep();
-
+        void playStepasSound();
         void requestAddDevice(Device device);
     }
 }
