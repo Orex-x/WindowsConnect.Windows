@@ -1,18 +1,15 @@
 ﻿using System;
-using System.IO;
-using System.Windows;
-using WindowsConnect.Services;
-using WindowsConnect.Interfaces;
-using Device = WindowsConnect.Models.Device;
 using System.Collections.ObjectModel;
-using System.Windows.Threading;
-using Application = System.Windows.Forms.Application;
-using System.Windows.Forms;
-using MessageBox = System.Windows.MessageBox;
-using System.Threading.Tasks;
-using System.Collections;
+using System.IO;
 using System.Media;
-using System.Reflection;
+using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Threading;
+using WindowsConnect.Interfaces;
+using WindowsConnect.Services;
+using Application = System.Windows.Forms.Application;
+using Device = WindowsConnect.Models.Device;
+using MessageBox = System.Windows.MessageBox;
 
 namespace WindowsConnect
 {
@@ -90,7 +87,7 @@ namespace WindowsConnect
         {
             InitializeComponent();
             Devices.ItemsSource = _device;
-            _udpClient = new UDPClientService(SettingsService.HostPort, this);
+            _udpClient = new UDPClientService(SettingsService.LISTEN_PORT, this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
         }

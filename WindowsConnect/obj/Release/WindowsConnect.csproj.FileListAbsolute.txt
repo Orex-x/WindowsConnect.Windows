@@ -18,3 +18,5 @@ C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Release\WindowsConn
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Release\WindowsConnect.csproj.CopyComplete
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Release\WindowsConnect.exe
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Release\WindowsConnect.pdb
+C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Release\res\stepas_sound.wav
+C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Release\WindowsConnect_Content.g.cs

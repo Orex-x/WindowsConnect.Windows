@@ -26,6 +26,7 @@ namespace WindowsConnect.Services
         {
             _commandController = commandController;
             _receiver = new UdpClient(port);
+            _receiver.JoinMulticastGroup(IPAddress.Parse("230.0.0.0"));
             var receiveThread = new Thread(new ThreadStart(ReceiveMessage));
             receiveThread.Start();
         }
@@ -86,7 +87,7 @@ namespace WindowsConnect.Services
                                 {
                                     Name = value["Name"],
                                     IP = value["IP"],
-                                    Port = SettingsService.ClientPort,
+                                    Port = SettingsService.SEND_PORT,
                                     DateConnect = DateTime.Now
                                 };
                                 _commandController.addDevice(device);
@@ -97,7 +98,7 @@ namespace WindowsConnect.Services
                                 {
                                     Name = value["Name"],
                                     IP = value["IP"],
-                                    Port = SettingsService.ClientPort,
+                                    Port = SettingsService.SEND_PORT,
                                     DateConnect = DateTime.Now
                                 };
                                 _commandController.requestAddDevice(device);
