@@ -87,7 +87,7 @@ namespace WindowsConnect.Services
                                 {
                                     Name = value["Name"],
                                     IP = value["IP"],
-                                    Port = SettingsService.SEND_PORT,
+                                    Port = SettingsService.UDP_SEND_PORT,
                                     DateConnect = DateTime.Now
                                 };
                                 _commandController.addDevice(device);
@@ -98,7 +98,7 @@ namespace WindowsConnect.Services
                                 {
                                     Name = value["Name"],
                                     IP = value["IP"],
-                                    Port = SettingsService.SEND_PORT,
+                                    Port = SettingsService.UDP_SEND_PORT,
                                     DateConnect = DateTime.Now
                                 };
                                 _commandController.requestAddDevice(device);

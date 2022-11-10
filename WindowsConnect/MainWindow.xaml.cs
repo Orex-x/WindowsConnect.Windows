@@ -87,9 +87,10 @@ namespace WindowsConnect
         {
             InitializeComponent();
             Devices.ItemsSource = _device;
-            _udpClient = new UDPClientService(SettingsService.LISTEN_PORT, this);
+            _udpClient = new UDPClientService(SettingsService.UDP_LISTEN_PORT, this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
+            TCPClientService.Receive();
         }
     }
 }

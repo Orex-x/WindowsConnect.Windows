@@ -8,8 +8,11 @@ namespace WindowsConnect.Services
 {
     public class SettingsService
     {
-        public const int LISTEN_PORT = 5000;
-        public const int SEND_PORT = 5001;
+        public const int UDP_LISTEN_PORT = 5000;
+        public const int UDP_SEND_PORT = 5001;
+
+        public const int TCP_LISTEN_PORT = 5002;
+        public const int TCP_SEND_PORT = 5003;
 
         public static JObject getHostInfo()
         {
@@ -18,7 +21,7 @@ namespace WindowsConnect.Services
                 .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
 
             var json = new JObject();
-            json["port"] = LISTEN_PORT;
+            json["port"] = UDP_LISTEN_PORT;
             json["localIP"] = hostIP.ToString();
             json["name"] = host.HostName;
             json["macAddress"] = GetMACAddress();

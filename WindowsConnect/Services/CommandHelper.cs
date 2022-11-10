@@ -10,7 +10,8 @@ namespace WindowsConnect.Services
     public enum Command
     {
         setHostInfo,
-        setWallpaper
+        setWallpaper,
+        saveFile,
     }
 
     public class CommandHelper
