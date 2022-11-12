@@ -20,3 +20,5 @@ C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\System.Diagno
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnect.csproj.Fody.CopyLocal.cache
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\WindowsConnect_Content.g.cs
 C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\res\stepas_sound.wav
+C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\System.Numerics.Vectors.xml
+C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml

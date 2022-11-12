@@ -13,9 +13,10 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace WindowsConnect
 {
-    public partial class MainWindow : Window, ICommandController
+    public partial class MainWindow : Window, ICommandController, IException
     {
         private UDPClientService _udpClient;
+        private TCPClientService _tcpClient;
         private VolumeService _volumeService;
         private ObservableCollection<Device> _device = new ObservableCollection<Device>();
 
@@ -40,6 +41,7 @@ namespace WindowsConnect
                 if(result == MessageBoxResult.Yes)
                 {
                     _device.Add(device);
+                    _tcpClient = new TCPClientService(this, device);
                 }
             }));
             sendWallpaper(device);
@@ -57,7 +59,7 @@ namespace WindowsConnect
                 
                 var command = CommandHelper.createCommand(Command.setWallpaper, bytes);
 
-                TCPClientService.SendMessage(command, device.IP, device.Port);
+                _tcpClient.SendMessage(command);
             }
             catch (Exception e)
             {
@@ -83,6 +85,22 @@ namespace WindowsConnect
             player.Play();
         }
 
+        public void Exception(Exception ex)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                MessageBox.Show(ex.Message);
+            }));
+        }
+
+        public void Message(string message)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                MessageBox.Show(message);
+            }));
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -90,7 +108,6 @@ namespace WindowsConnect
             _udpClient = new UDPClientService(SettingsService.UDP_LISTEN_PORT, this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
-            TCPClientService.Receive();
         }
     }
 }
