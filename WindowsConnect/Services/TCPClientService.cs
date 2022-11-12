@@ -1,4 +1,6 @@
 ﻿
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Net;
@@ -8,8 +10,10 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Markup;
 using System.Windows.Threading;
+using WindowsConnect.Models;
 
 namespace WindowsConnect.Services
 {
@@ -35,8 +39,6 @@ namespace WindowsConnect.Services
                 var listener = new TcpListener(ipEndPoint);
                 listener.Start();
 
-
-
                 while (true)
                 {
                     try
@@ -44,25 +46,35 @@ namespace WindowsConnect.Services
                         var handler = listener.AcceptTcpClient();
                         var stream = handler.GetStream();
 
-                        // буфер для получения данных
-                        var buffer = new byte[512];
-                        // StringBuilder для склеивания полученных данных в одну строку
-                        var response = new StringBuilder();
-                        int bytes;  // количество полученных байтов
+                        byte[] buffer = new byte[1000000];
+                        int count = 0;
+                        int bytesReceived = 0;
                         do
                         {
-                            // получаем данные
-                            bytes = await stream.ReadAsync(buffer, 0, buffer.Length);
-                            // преобразуем в строку и добавляем ее в StringBuilder
-                            response.Append(Encoding.UTF8.GetString(buffer, 0, bytes));
+                            bytesReceived = await stream.ReadAsync(buffer, count, buffer.Length - count);
+                            count += bytesReceived;
                         }
-                        while (bytes > 0); // пока данные есть в потоке 
+                        while (stream.DataAvailable);
 
-                        // выводим данные на консоль
-                        Console.WriteLine(response);
-                        SaveByteArrayToFileWithBinaryWriterCreate(Encoding.UTF8.GetBytes(response.ToString()), "documrnt.docx");
+                        string buffer_string = Encoding.UTF8.GetString(buffer);
+                        dynamic jsonObj = JsonConvert.DeserializeObject(buffer_string.ToString());
+                        string command = jsonObj["command"];
 
+                        dynamic value = null;
+                        switch (command)
+                        {
+                            case "saveFile":
+                                value = jsonObj["value"];
 
+                                var f = new MyFile()
+                                {
+                                    Name = value["name"],
+                                    Data = value["data"]
+                                };
+                                File.WriteAllBytes(f.Name, f.Data);
+
+                                break;
+                        }
                     }
                     catch (Exception e)
                     {
@@ -72,14 +84,6 @@ namespace WindowsConnect.Services
             });
            
         }
-
-        public static void SaveByteArrayToFileWithBinaryWriterCreate(byte[] data, string filePath)
-        {
-            var writer = new BinaryWriter(File.OpenWrite(filePath));
-            writer.Write(data);
-            writer.Close();
-        }
-
     }
 }
 
@@ -92,56 +96,53 @@ namespace WindowsConnect.Services
 
 
 
+/*
+
+Console.WriteLine(num);
+var messageStr = message.ToString();
+var data = Encoding.UTF8.GetBytes(messageStr);
+
+
+SaveByteArrayToFileWithBinaryWriterCreate(data, "documrnt.docx");
+
+dynamic jsonObj = JsonConvert.DeserializeObject(message.ToString());
+string command = jsonObj["command"];
+
+
+dynamic value = null;
+
+switch (command)
+{
+    case "saveFile":
+        value = jsonObj["value"];
+
+        var f = new MyFile()
+        {
+            Name = value["name"],
+            Data = value["data"]
+        };
+
+        var d = Encoding.UTF8.GetBytes(f.Data);
+
+
+        SaveByteArrayToFileWithBinaryWriter(d, f.Name);
+        break;
+}
+*/
 
 
 
-/*                        var handler = listener.AcceptTcpClient();
-                        var tcpStream = handler.GetStream();
+/*var handler = listener.AcceptTcpClient();
+var stream = handler.GetStream();
 
-                        byte[] buffer = new byte[512];
+byte[] buffer = new byte[700000];
+int count = 0;
+int bytesReceived = 0;
+do
+{
+    bytesReceived = await stream.ReadAsync(buffer, count, buffer.Length - count);
+    count += bytesReceived;
+}
+while (stream.DataAvailable);
 
-                        Console.WriteLine("ку");
-                        var message = new StringBuilder();
-
-                        int c;
-                        int num = 0;
-                        do
-                        {
-                            num++;
-                            c = tcpStream.Read(buffer, 0, buffer.Length);
-                            var str = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                            message.Append(str);
-
-                        }
-                        while (c > 0);
-
-                        Console.WriteLine(num);
-                        var messageStr = message.ToString();
-                        var data = Encoding.UTF8.GetBytes(messageStr);
-
-
-                        SaveByteArrayToFileWithBinaryWriterCreate(data, "documrnt.docx");
-
-*//*                        dynamic jsonObj = JsonConvert.DeserializeObject(message.ToString());
-                        string command = jsonObj["command"];
-
-
-                        dynamic value = null;
-
-                        switch (command)
-                        {
-                            case "saveFile":
-                                value = jsonObj["value"];
-
-                                var f = new MyFile()
-                                {
-                                    Name = value["name"],
-                                    Data = value["data"]
-                                };
-
-                                var d = Encoding.UTF8.GetBytes(f.Data);
-
-
-                                SaveByteArrayToFileWithBinaryWriter(d, f.Name);
-                                break;
-                        }*/
+File.WriteAllBytes("testFile", buffer);*/
