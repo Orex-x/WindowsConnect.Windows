@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Media;
 using System.Windows;
@@ -112,7 +113,11 @@ namespace WindowsConnect
 
         public void resetProgress()
         {
-            pbStatus.Value = 0;
+            Dispatcher.Invoke(new Action(() =>
+            {
+                pbStatus.Value = 0;
+            }));
+         
         }
 
         public MainWindow()
@@ -122,6 +127,7 @@ namespace WindowsConnect
             _udpClient = new UDPClientService(SettingsService.UDP_LISTEN_PORT, this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
+            setProgress(10);
         }
     }
 }

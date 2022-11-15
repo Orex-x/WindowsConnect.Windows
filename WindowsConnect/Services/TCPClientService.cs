@@ -82,7 +82,6 @@ namespace WindowsConnect.Services
 
                         int length = BitConverter.ToInt32(headerBuffer, 0);
                         _tcpClientServiceListener.Message($"пришел файл. Размер {length} байт");
-                        _tcpClientServiceListener.resetProgress();
                         byte[] buffer = new byte[length];
                         int count = 0;
 
@@ -111,7 +110,7 @@ namespace WindowsConnect.Services
                                     Data = value["data"]
                                 };
                                 File.WriteAllBytes(f.Name, f.Data);
-
+                                _tcpClientServiceListener.resetProgress();
                                 var file = new FileInfo(f.Name);
                                 _tcpClientServiceListener.Message($"Файл {f.Name} сохранен по пути {file.FullName}");
                                 break;
