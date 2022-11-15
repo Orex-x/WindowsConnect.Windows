@@ -13,6 +13,7 @@
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="1">
             <Image x:Name="imgQRCode" Width="200" Height="200" VerticalAlignment="Top" Margin="20"/>
+            <ProgressBar Height="10" VerticalAlignment="Bottom" x:Name="pbStatus" Grid.Row="1" Minimum="0" Maximum="100" Value="0"/>
         </Grid>
 
         <Grid Grid.Column="0">

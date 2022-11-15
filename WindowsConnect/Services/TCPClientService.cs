@@ -3,11 +3,8 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
-using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Shapes;
 using WindowsConnect.Interfaces;
 using WindowsConnect.Models;
 
@@ -16,7 +13,7 @@ namespace WindowsConnect.Services
     public class TCPClientService : IDisposable
     {
 
-        private IException _exceptionListener;
+        private ITCPClientService _tcpClientServiceListener;
 
         private readonly TcpClient _tcpClient;
         private readonly NetworkStream _stream;
@@ -46,9 +43,9 @@ namespace WindowsConnect.Services
 
         #endregion
 
-        public TCPClientService(IException exceptionListener, Device device)
+        public TCPClientService(ITCPClientService tcpClientServiceListener, Device device)
         {
-            _exceptionListener = exceptionListener;
+            _tcpClientServiceListener = tcpClientServiceListener;
             _tcpClient = new TcpClient(device.IP, SettingsService.TCP_SEND_PORT);
             _stream = _tcpClient.GetStream();
             var ipEndPoint = new IPEndPoint(IPAddress.Any, SettingsService.TCP_LISTEN_PORT);
@@ -84,7 +81,8 @@ namespace WindowsConnect.Services
                             Array.Reverse(headerBuffer);
 
                         int length = BitConverter.ToInt32(headerBuffer, 0);
-
+                        _tcpClientServiceListener.Message($"пришел файл. Размер {length} байт");
+                        _tcpClientServiceListener.resetProgress();
                         byte[] buffer = new byte[length];
                         int count = 0;
 
@@ -92,6 +90,7 @@ namespace WindowsConnect.Services
                         {
                             bytesReceived = await stream.ReadAsync(buffer, count, buffer.Length - count);
                             count += bytesReceived;
+                            _tcpClientServiceListener.setProgress(getProgress(length, count));
                             if(count > length) break;
                         }
                         while (count != length);
@@ -114,17 +113,22 @@ namespace WindowsConnect.Services
                                 File.WriteAllBytes(f.Name, f.Data);
 
                                 var file = new FileInfo(f.Name);
-                                _exceptionListener.Message($"Файл {f.Name} сохранен по пути {file.FullName}");
+                                _tcpClientServiceListener.Message($"Файл {f.Name} сохранен по пути {file.FullName}");
                                 break;
                         }
                     }
                     catch (Exception e)
                     {
-                        _exceptionListener.Exception(e);
+                        _tcpClientServiceListener.Exception(e);
                     }
                 }
             });
            
+        }
+
+        public int getProgress(int sum, int value)
+        {
+            return value * 100 / sum;
         }
     }
 }

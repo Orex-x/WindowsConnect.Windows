@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\obj\Debug\
+C:\Users\dana\source\repos\WindowsConnect.Windows\WindowsConnect\obj\Debug\
 WindowsConnect
 none
 false
 DEBUG;TRACE
-C:\Users\dana\source\repos\WindowsConnect\WindowsConnect\App.xaml
-1219584333
+C:\Users\dana\source\repos\WindowsConnect.Windows\WindowsConnect\App.xaml
+2865283940
 11927165194
-15-444205626
-1321511513498
-MainWindow.xaml;
+171663786381
+132-157000324
+DialogWindows\DownloadFile.xaml;MainWindow.xaml;
 
 False
 

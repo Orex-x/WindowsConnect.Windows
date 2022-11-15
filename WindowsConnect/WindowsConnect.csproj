@@ -211,8 +211,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DialogWindows\DownloadFile.xaml.cs">
+      <DependentUpon>DownloadFile.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Interfaces\ICommandController.cs" />
     <Compile Include="Interfaces\IException.cs" />
+    <Compile Include="Interfaces\ITCPClientService.cs" />
     <Compile Include="Models\Device.cs" />
     <Compile Include="Models\MyFile.cs" />
     <Compile Include="Services\CommandHelper.cs" />
@@ -221,6 +225,10 @@
     <Compile Include="Services\TCPClientService.cs" />
     <Compile Include="Services\UDPClientService.cs" />
     <Compile Include="Services\VolumeService.cs" />
+    <Page Include="DialogWindows\DownloadFile.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

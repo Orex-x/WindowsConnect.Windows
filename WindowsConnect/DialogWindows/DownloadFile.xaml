@@ -1,0 +1,17 @@
+﻿<Window x:Class="WindowsConnect.DialogWindows.DownloadFile"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WindowsConnect.DialogWindows"
+        mc:Ignorable="d"
+        Title="DownloadFile" Height="100" Width="200">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="10"/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="txtFileName"/>
+        <ProgressBar x:Name="pbStatus" Grid.Row="1" Minimum="0" Maximum="100" Value="20"/>
+    </Grid>
+</Window>

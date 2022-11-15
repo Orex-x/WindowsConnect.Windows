@@ -13,7 +13,7 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace WindowsConnect
 {
-    public partial class MainWindow : Window, ICommandController, IException
+    public partial class MainWindow : Window, ICommandController, IException, ITCPClientService
     {
         private UDPClientService _udpClient;
         private TCPClientService _tcpClient;
@@ -36,6 +36,7 @@ namespace WindowsConnect
         {
             Dispatcher.Invoke(new Action(() =>
             {
+                playStepasSound();
                 var result = MessageBox.Show($"Устройство {device.Name} запрашевает подключение.\n " +
                     $"Подключить данное устройство?", "Добавление устройства", MessageBoxButton.YesNo);
                 if(result == MessageBoxResult.Yes)
@@ -99,6 +100,19 @@ namespace WindowsConnect
             {
                 MessageBox.Show(message);
             }));
+        }
+
+        public void setProgress(int progress)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                pbStatus.Value = progress;
+            }));
+        }
+
+        public void resetProgress()
+        {
+            pbStatus.Value = 0;
         }
 
         public MainWindow()
