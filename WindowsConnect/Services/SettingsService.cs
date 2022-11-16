@@ -11,8 +11,8 @@ namespace WindowsConnect.Services
         public const int UDP_LISTEN_PORT = 5000;
         public const int UDP_SEND_PORT = 5001;
 
-        public const int TCP_LISTEN_PORT = 5002;
-        public const int TCP_SEND_PORT = 5003;
+        //public const int TCP_LISTEN_PORT = 5002;
+        public const int TCP_PORT = 5005;
 
         public static JObject getHostInfo()
         {

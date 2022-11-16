@@ -48,3 +48,5 @@ C:\Users\dana\source\repos\WindowsConnect.Windows\WindowsConnect\obj\Debug\Windo
 C:\Users\dana\source\repos\WindowsConnect.Windows\WindowsConnect\obj\Debug\WindowsConnect.pdb
 C:\Users\dana\source\repos\WindowsConnect.Windows\WindowsConnect\obj\Debug\DialogWindows\DownloadFile.g.cs
 C:\Users\dana\source\repos\WindowsConnect.Windows\WindowsConnect\obj\Debug\DialogWindows\DownloadFile.baml
+C:\Users\dana\source\repos\WindowsConnect.Windows\WindowsConnect\bin\Debug\System.Threading.Channels.xml
+C:\Users\dana\source\repos\WindowsConnect.Windows\WindowsConnect\bin\Debug\System.Threading.Tasks.Extensions.xml

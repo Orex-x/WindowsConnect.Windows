@@ -42,8 +42,8 @@ namespace WindowsConnect
                     $"Подключить данное устройство?", "Добавление устройства", MessageBoxButton.YesNo);
                 if(result == MessageBoxResult.Yes)
                 {
-                    _device.Add(device);
                     _tcpClient = new TCPClientService(this, device);
+                    _device.Add(device);
                 }
             }));
             sendWallpaper(device);
@@ -127,7 +127,6 @@ namespace WindowsConnect
             _udpClient = new UDPClientService(SettingsService.UDP_LISTEN_PORT, this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
-            setProgress(10);
         }
     }
 }
