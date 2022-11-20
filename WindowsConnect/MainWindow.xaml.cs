@@ -46,6 +46,7 @@ namespace WindowsConnect
                     UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
                     _tcpClient = new TCPClientService(this, device);
                     _device.Add(device);
+                    sendWallpaper(device);
                 }
                 else
                 {
@@ -53,7 +54,7 @@ namespace WindowsConnect
                 }
             }));
 
-            sendWallpaper(device);
+          
         }
 
 
