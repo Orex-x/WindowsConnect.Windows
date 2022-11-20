@@ -2,14 +2,10 @@
 using System;
 using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using WindowsConnect.DialogWindows;
 using WindowsConnect.Interfaces;
 using WindowsConnect.Models;
 
@@ -59,16 +55,6 @@ namespace WindowsConnect.Services
 
         public TCPClientService(ITCPClientService tcpClientServiceListener, Device device)
         {
-            /*
-            _tcpClientServiceListener = tcpClientServiceListener;
-            _tcpClient = new TcpClient(device.IP, SettingsService.TCP_PORT);
-            _stream = _tcpClient.GetStream();
-
-            var ipEndPoint = new IPEndPoint(IPAddress.Any, SettingsService.TCP_LISTEN_PORT);
-            _listener = new TcpListener(ipEndPoint);
-            _listener.Start();
-            */
-           
             _tcpClientServiceListener = tcpClientServiceListener;
             _listener = new TcpListener(IPAddress.Any, SettingsService.TCP_PORT);
             _listener.Start();
@@ -93,7 +79,7 @@ namespace WindowsConnect.Services
             _stream.Write(data, 0, data.Length);
         }
 
-        private async Task Receive()
+        private async void Receive()
         {
             await Task.Yield();
             await Task.Run(async () =>
@@ -134,10 +120,8 @@ namespace WindowsConnect.Services
                         {
                             case "saveFile":
                                 value = jsonObj["value"];
-                                _tcpClientServiceListener.Message($"пришел файл. Размер {length} байт");
                                 string name = value["name"];
-                                //SendMessage("go");
-                                await downloadFile("data\\" + name);
+                                await uploadFileFromSocket("data\\" + name);
                                 break;
                         }
                     }
@@ -150,7 +134,7 @@ namespace WindowsConnect.Services
            
         }
 
-        public async Task downloadFile(string name)
+        public async Task uploadFileFromSocket(string name)
         {
             await Task.Run( async () =>
             {
@@ -172,12 +156,11 @@ namespace WindowsConnect.Services
                 {
                     do
                     {
-                        // bytesReceived = await _stream.ReadAsync(buffer, count, buffer.Length - count);
                         bytesReceived = await _stream.ReadAsync(buffer, 0, buffer.Length);
                         fstream.Write(buffer, 0, bytesReceived);
                         count += bytesReceived;
                         int p = (int)getProgress(length, count);
-                        _tcpClientServiceListener.setProgress(p);
+                        _tcpClientServiceListener.SetProgress(p);
                         if (count > length) break;
 
                     }
@@ -185,8 +168,7 @@ namespace WindowsConnect.Services
 
 
                 }
-                //File.WriteAllBytes("data\\"+ name, buffer);
-                _tcpClientServiceListener.resetProgress();
+                _tcpClientServiceListener.ResetProgress();
                 var file = new FileInfo(name);
                 _tcpClientServiceListener.Message($"Файл {name} сохранен по пути {file.FullName}");
             });
@@ -201,8 +183,6 @@ namespace WindowsConnect.Services
                     streamToWrite.Write(buffer, 0, nRead);
                 }
         }
-
-
 
         public long getProgress(long sum, long value)
         {

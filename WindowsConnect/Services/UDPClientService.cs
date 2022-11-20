@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -22,10 +23,10 @@ namespace WindowsConnect.Services
             return _receiver;
         }
 
-        public UDPClientService(int port, ICommandController commandController)
+        public UDPClientService(ICommandController commandController)
         {
             _commandController = commandController;
-            _receiver = new UdpClient(port);
+            _receiver = new UdpClient(SettingsService.UDP_LISTEN_PORT);
             _receiver.JoinMulticastGroup(IPAddress.Parse("230.0.0.0"));
             var receiveThread = new Thread(new ThreadStart(ReceiveMessage));
             receiveThread.Start();
@@ -39,6 +40,14 @@ namespace WindowsConnect.Services
         public static void SendMessage(byte[] data, string ip, int port)
         {
             var udp = new UdpClient();
+
+            int intValue = data.Length;
+            byte[] intBytes = BitConverter.GetBytes(intValue);
+
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(intBytes);
+
+            udp.Send(intBytes, intBytes.Length, ip, port);
             udp.Send(data, data.Length, ip, port);
             udp.Close();
         } 
@@ -47,6 +56,14 @@ namespace WindowsConnect.Services
         {
             var data = Encoding.UTF8.GetBytes(message);
             var udp = new UdpClient();
+
+            int intValue = data.Length;
+            byte[] intBytes = BitConverter.GetBytes(intValue);
+
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(intBytes);
+
+            udp.Send(intBytes, intBytes.Length, ip, port);
             udp.Send(data, data.Length, ip, port);
             udp.Close();
         }
@@ -73,13 +90,13 @@ namespace WindowsConnect.Services
                         {
                             case "changeVolume":
                                 int volume = jsonObj["value"];
-                                _commandController.setVolume(volume);
+                                _commandController.SetVolume(volume);
                                 break;
                             case "sleep":
-                                _commandController.sleep();
+                                _commandController.Sleep();
                                 break;
                             case "playStepasSound":
-                                _commandController.playStepasSound();
+                                _commandController.PlayStepasSound();
                                 break;
                             case "addDevice":
                                 value = jsonObj["value"];
@@ -90,7 +107,7 @@ namespace WindowsConnect.Services
                                     Port = SettingsService.UDP_SEND_PORT,
                                     DateConnect = DateTime.Now
                                 };
-                                _commandController.addDevice(device);
+                                _commandController.AddDevice(device);
                                 break;
                             case "requestAddDevice":
                                 value = jsonObj["value"];
@@ -101,7 +118,7 @@ namespace WindowsConnect.Services
                                     Port = SettingsService.UDP_SEND_PORT,
                                     DateConnect = DateTime.Now
                                 };
-                                _commandController.requestAddDevice(device);
+                                _commandController.RequestAddDevice(device);
                                 break;
                             default:
                                 

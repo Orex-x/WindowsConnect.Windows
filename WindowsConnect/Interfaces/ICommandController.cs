@@ -9,10 +9,10 @@ namespace WindowsConnect.Interfaces
 {
     public interface ICommandController
     {
-        void setVolume(int volume);
-        void addDevice(Device device);
-        void sleep();
-        void playStepasSound();
-        void requestAddDevice(Device device);
+        void SetVolume(int volume);
+        void AddDevice(Device device);
+        void Sleep();
+        void PlayStepasSound();
+        void RequestAddDevice(Device device);
     }
 }

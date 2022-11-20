@@ -2,7 +2,7 @@
 {
     public interface ITCPClientService : IException
     {
-        void setProgress(int progress);
-        void resetProgress();
+        void SetProgress(int progress);
+        void ResetProgress();
     }
 }

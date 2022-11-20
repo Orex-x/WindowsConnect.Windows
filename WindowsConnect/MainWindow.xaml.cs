@@ -28,26 +28,35 @@ namespace WindowsConnect
             base.OnClosed(e);
         }
 
-        public void setVolume(int volume)
+        public void SetVolume(int volume)
         {
             _volumeService.setVolume(volume);
         }
 
-        public async void addDevice(Device device)
+
+        public void AddDevice(Device device)
         {
             Dispatcher.Invoke(new Action(() =>
             {
-                playStepasSound();
+                PlayStepasSound();
                 var result = MessageBox.Show($"Устройство {device.Name} запрашевает подключение.\n " +
                     $"Подключить данное устройство?", "Добавление устройства", MessageBoxButton.YesNo);
-                if(result == MessageBoxResult.Yes)
+                if (result == MessageBoxResult.Yes)
                 {
+                    UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
                     _tcpClient = new TCPClientService(this, device);
                     _device.Add(device);
                 }
+                else
+                {
+                    UDPClientService.SendMessage("500", device.IP, SettingsService.UDP_LISTEN_PORT);
+                }
             }));
+
             sendWallpaper(device);
         }
+
+
         private void sendWallpaper(Device device)
         {
             try
@@ -70,18 +79,18 @@ namespace WindowsConnect
         }
 
 
-        public void sleep()
+        public void Sleep()
         {
             Application.SetSuspendState(PowerState.Hibernate, false, false);
         }
 
-        public void requestAddDevice(Device device)
+        public void RequestAddDevice(Device device)
         {
             var command = CommandHelper.createCommand(Command.setHostInfo, SettingsService.getHostInfo());
             UDPClientService.SendMessage(command, device.IP, device.Port);
         }
 
-        public void playStepasSound()
+        public void PlayStepasSound()
         {
             var player = new SoundPlayer($"{Environment.CurrentDirectory}\\res\\stepas_sound.wav");
             player.Play();
@@ -103,15 +112,9 @@ namespace WindowsConnect
             }));
         }
 
-        public void setProgress(int progress)
-        {
-            Dispatcher.Invoke(new Action(() =>
-            {
-                pbStatus.Value = progress;
-            }));
-        }
+    
 
-        public void resetProgress()
+        public void ResetProgress()
         {
             Dispatcher.Invoke(new Action(() =>
             {
@@ -120,11 +123,19 @@ namespace WindowsConnect
          
         }
 
+        public void SetProgress(int progress)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                pbStatus.Value = progress;
+            }));
+        }
+
         public MainWindow()
         {
             InitializeComponent();
             Devices.ItemsSource = _device;
-            _udpClient = new UDPClientService(SettingsService.UDP_LISTEN_PORT, this);
+            _udpClient = new UDPClientService(this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
         }
