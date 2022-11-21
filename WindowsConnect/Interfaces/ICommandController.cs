@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WindowsConnect.Models;
+﻿using WindowsConnect.Models;
 
 namespace WindowsConnect.Interfaces
 {
@@ -14,5 +9,15 @@ namespace WindowsConnect.Interfaces
         void Sleep();
         void PlayStepasSound();
         void RequestAddDevice(Device device);
+
+        void VirtualSingleTouchDown(int x, int y);
+        void VirtualSingleTouchUp(int x, int y);
+        void VirtualSingleTouchMove(int x, int y);
+        void VirtualSingleTouchLeftClick();
+        void VirtualSingleTouchRightClick();
+
+        void VirtualMultiTouchDown(int x, int y);
+        void VirtualMultiTouchUp(int x, int y);
+        void VirtualMultiTouchMove(int x, int y);
     }
 }

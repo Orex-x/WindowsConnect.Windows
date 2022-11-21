@@ -8,9 +8,11 @@ using System.Windows.Forms;
 using System.Windows.Threading;
 using WindowsConnect.Interfaces;
 using WindowsConnect.Services;
+
 using Application = System.Windows.Forms.Application;
 using Device = WindowsConnect.Models.Device;
 using MessageBox = System.Windows.MessageBox;
+
 
 namespace WindowsConnect
 {
@@ -132,6 +134,50 @@ namespace WindowsConnect
             }));
         }
 
+        public void VirtualSingleTouchDown(int x, int y)
+        {
+            MouseService.setDownCoordinates(x, y);
+        }
+
+        public void VirtualSingleTouchUp(int x, int y)
+        {
+
+        }
+
+        public void VirtualSingleTouchMove(int x, int y)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                txtMouseLog.Text = $"move  x: {x} y: {y}";
+                MouseService.MoveCursor(x, y);
+            }));
+        }
+
+        public void VirtualSingleTouchLeftClick()
+        {
+            MouseService.LeftMouseClick();
+        }
+
+        public void VirtualSingleTouchRightClick()
+        {
+            MouseService.RigthMouseClick();
+        }
+
+        public void VirtualMultiTouchDown(int x, int y)
+        {
+            MouseService.setDownCoordinates(x, y);
+        }
+
+        public void VirtualMultiTouchUp(int x, int y)
+        {
+           
+        }
+
+        public void VirtualMultiTouchMove(int x, int y)
+        {
+            MouseService.MoveMouseWheel(x, y);
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -139,6 +185,17 @@ namespace WindowsConnect
             _udpClient = new UDPClientService(this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
+
+           
+
+            int w = SystemInformation.VirtualScreen.Width;
+            int h = SystemInformation.VirtualScreen.Height;
+
+            txtMouseLog.Text = "test";
+
+            
+
+            // MessageBox.Show(MouseService.ShowMousePosition());
         }
     }
 }

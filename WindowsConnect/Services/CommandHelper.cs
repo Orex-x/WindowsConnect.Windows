@@ -12,6 +12,13 @@ namespace WindowsConnect.Services
         setHostInfo,
         setWallpaper,
         saveFile,
+        virtualSingleTouchDown,
+        virtualSingleTouchUp,
+        virtualSingleTouchMove,
+        virtualSingleTouchRightClick,
+        virtualMultiTouchDown,
+        virtualMultiTouchUp,
+        virtualMultiTouchMove
     }
 
     public class CommandHelper

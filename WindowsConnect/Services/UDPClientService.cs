@@ -85,6 +85,8 @@ namespace WindowsConnect.Services
 
                         dynamic value = null;
                         Device device = null;
+                        int x;
+                        int y;
 
                         switch (command)
                         {
@@ -119,6 +121,56 @@ namespace WindowsConnect.Services
                                     DateConnect = DateTime.Now
                                 };
                                 _commandController.RequestAddDevice(device);
+                                break;
+
+                            case "virtualSingleTouchDown":
+                                value = jsonObj["value"];
+                                x = value["x"];
+                                y = value["y"];
+                                _commandController.VirtualSingleTouchDown(x, y);
+                                break;
+                            case "virtualSingleTouchUp":
+                                value = jsonObj["value"];
+                                 x = value["x"];
+                                 y = value["y"];
+                                _commandController.VirtualSingleTouchUp(x, y);
+                                break;
+                            case "virtualSingleTouchMove":
+                                value = jsonObj["value"];
+                                 x = value["x"];
+                                 y = value["y"];
+                                _commandController.VirtualSingleTouchMove(x, y);
+                                break;
+
+                            case "virtualSingleTouchRightClick":
+                                _commandController.VirtualSingleTouchRightClick();
+                                break; 
+                            
+                            case "virtualSingleTouchLeftClick":
+                                _commandController.VirtualSingleTouchLeftClick();
+
+                                break;
+
+                            case "virtualMultiTouchDown":
+                                value = jsonObj["value"];
+                                x = value["x"];
+                                y = value["y"];
+                                _commandController.VirtualMultiTouchDown(x, y);
+
+                                break;
+                            case "virtualMultiTouchUp":
+                                value = jsonObj["value"];
+                                x = value["x"];
+                                y = value["y"];
+                                _commandController.VirtualMultiTouchUp(x, y);
+
+                                break;
+                            case "virtualMultiTouchMove":
+                                value = jsonObj["value"];
+                                x = value["x"];
+                                y = value["y"];
+                                _commandController.VirtualMultiTouchMove(x, y);
+
                                 break;
                             default:
                                 
