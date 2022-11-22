@@ -1,29 +1,41 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WindowsConnect.Services
 {
-    public enum Command
+    /*public enum Command
     {
-        setHostInfo,
-        setWallpaper,
-        saveFile,
+        SetHostInfo,
+        SetWallpaper,
+        SaveFile,
         virtualSingleTouchDown,
         virtualSingleTouchUp,
         virtualSingleTouchMove,
         virtualSingleTouchRightClick,
         virtualMultiTouchDown,
         virtualMultiTouchUp,
-        virtualMultiTouchMove
+        virtualMultiTouchMove,
+        virtualSingleTouchHookMove
     }
+*/
+
+    public static class Command
+    {
+        public const int ChangeVolume = 0;
+        public const int AddDevice = 1;
+        public const int Sleep = 2;
+        public const int RequestAddDevice = 3;
+        public const int SetHostInfo = 4;
+        public const int SetWallpaper = 5;
+        public const int PlayStepasSound = 6;
+        public const int SaveFile = 7;
+        public const int VirtualTouchPadChanged = 8;
+
+    }
+
 
     public class CommandHelper
     {
-        public static string createCommand(Command command, object obj)
+        public static string createCommand(int command, object obj)
         {
             var json = JsonConvert.SerializeObject(obj);
             return "{\"command\" : " + "\"" + command + "\"" + ", \"value\" : " + json + "}";

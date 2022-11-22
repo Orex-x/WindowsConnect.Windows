@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Threading;
+using WindowsConnect.Models;
 
 namespace WindowsConnect.Services
 {
@@ -16,7 +17,9 @@ namespace WindowsConnect.Services
         static int _x, _y;
         static int _singleDownX, _singleDownY;
         static int _multiplyDownX, _multiplyDownY;
-        static int _upX, _upY;
+        static int _bufferX, _bufferY;
+
+        static Cursor _cursor = Cursor.Current;
 
         [DllImport("user32.dll")]
         static extern bool GetCursorPos(out POINT lpPoint);
@@ -27,7 +30,7 @@ namespace WindowsConnect.Services
         [DllImport("user32.dll")]
         static extern bool ClientToScreen(IntPtr hWnd, ref POINT lpPoint);
 
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [DllImport("user32.dll")]
         public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
 
         public const int MOUSEEVENTF_LEFTDOWN = 0x0002;
@@ -36,6 +39,96 @@ namespace WindowsConnect.Services
         public const int MOUSEEVENTF_RIGHTUP = 0x0010;
         private const int MOUSEEVENTF_WHEEL = 0x0800;
 
+
+
+        static bool hookClick = false; // для иммитации зажатой левой мышки при удержании
+        static bool doubleClick = false; // для иммитации зажатой левой мышки
+        static bool leftClick = false; //для иммитации левого клика мыши
+        static bool multiClick = false; //для иммитации правого клика мыши
+        static bool multiTouchUp = false;
+
+        public static void VirtualTouchPadChanged(int x, int y, int action, int pointer)
+        {
+            switch (action)
+            {
+                case MouseEvent.ACTION_MOVE:
+                    if (pointer > 1 || multiTouchUp)
+                    {
+                        MoveMouseWheel(x, y);
+                    }
+                    else
+                    {
+                        if (_bufferX != x || _bufferY != y)
+                        {
+                            hookClick = false;
+                        }
+
+                        if (hookClick)
+                        {
+                            LeftMouseClickDown();
+                            hookClick = false;
+                        }
+
+                        if (!multiClick)
+                            MoveCursor(x, y);
+                    }
+                    break;
+                case MouseEvent.ACTION_DOWN:
+                   
+                    setDownCoordinates(x, y);
+
+                    _bufferX = x; _bufferY = y;
+                    hookClick = false;
+                    Task.Delay(200).ContinueWith(_ => { hookClick = true; });
+
+                    if (doubleClick)
+                    {
+                        LeftMouseClickDown();
+                    }
+                    else
+                    {
+                        leftClick = true;
+                        Task.Delay(50).ContinueWith(_ => { leftClick = false; });
+                    }
+
+                   
+                    break;
+                case MouseEvent.ACTION_UP:
+
+                    hookClick = false;
+                    doubleClick = false;
+                    if (leftClick && !multiClick && !multiTouchUp)
+                    {
+                        doubleClick = true;
+                        Task.Delay(150).ContinueWith(_ => { doubleClick = false; });
+                        LeftMouseClick();
+                    }
+
+                    if(!multiClick && !multiTouchUp)
+                    {
+                        LeftMouseClickUp();
+                    }
+                  
+                    break;
+                case MouseEvent.ACTION_POINTER_DOWN:
+                    multiTouchUp = true;
+                    multiClick = true;
+                    Task.Delay(50).ContinueWith(_ => { multiClick = false; });
+                    break;
+                case MouseEvent.ACTION_POINTER_UP:
+
+                    Task.Delay(200).ContinueWith(_ => { multiTouchUp = false; });
+                    if (multiClick)
+                    {
+                        RigthMouseClick();
+                    }
+                   
+
+                    break;
+            }
+        }
+
+  
         public static void SetMousePosition()
         {
             POINT point;
@@ -46,23 +139,33 @@ namespace WindowsConnect.Services
             }
         }
 
-        //This simulates a left mouse click
-        public static void LeftMouseClick()
+        private static void LeftMouseClick()
         {
-            SetMousePosition();
+            //SetMousePosition();
             mouse_event(MOUSEEVENTF_LEFTDOWN, _x, _y, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, _x, _y, 0, 0);
         }
 
-        public static void RigthMouseClick()
+        private static void RigthMouseClick()
         {
             SetMousePosition();
             mouse_event(MOUSEEVENTF_RIGHTDOWN, _x, _y, 0, 0);
             mouse_event(MOUSEEVENTF_RIGHTUP, _x, _y, 0, 0);
         }
-       
 
-        public static void setDownCoordinates(int x, int y)
+        private static void LeftMouseClickDown()
+        {
+           // SetMousePosition();
+            mouse_event(MOUSEEVENTF_LEFTDOWN, _x, _y, 0, 0);
+        } 
+
+        private static void LeftMouseClickUp()
+        {
+            //SetMousePosition();
+            mouse_event(MOUSEEVENTF_LEFTUP, _x, _y, 0, 0);
+        }
+
+        private static void setDownCoordinates(int x, int y)
         {
             SetMousePosition();
             _singleDownX = x;
@@ -72,20 +175,20 @@ namespace WindowsConnect.Services
             _multiplyDownY = y;
         }
 
-        public static void MoveCursor(int x, int y)
+        private static void MoveCursor(int x, int y)
         {
             var p = new POINT();
 
             p.X = _x + (x - _singleDownX);
             p.Y = _y + (y - _singleDownY);
 
-            ClientToScreen(Cursor.Current.Handle, ref p);
+            ClientToScreen(_cursor.Handle, ref p);
             SetCursorPos(p.X, p.Y);
         }
 
-        public static void MoveMouseWheel(int x, int y)
+        private static void MoveMouseWheel(int x, int y)
         {
-            int a = (int)((y - _multiplyDownY) * 1.5);
+            int a = (int)((y - _multiplyDownY) * 2);
             mouse_event(MOUSEEVENTF_WHEEL, 0, 0, a, 0);
             _multiplyDownY = y;
         }

@@ -71,7 +71,7 @@ namespace WindowsConnect
 
                 byte[] bytes = File.ReadAllBytes(path);
                 
-                var command = CommandHelper.createCommand(Command.setWallpaper, bytes);
+                var command = CommandHelper.createCommand(Command.SetWallpaper, bytes);
 
                 _tcpClient.SendMessage(command);
             }
@@ -89,7 +89,7 @@ namespace WindowsConnect
 
         public void RequestAddDevice(Device device)
         {
-            var command = CommandHelper.createCommand(Command.setHostInfo, SettingsService.getHostInfo());
+            var command = CommandHelper.createCommand(Command.SetHostInfo, SettingsService.getHostInfo());
             UDPClientService.SendMessage(command, device.IP, device.Port);
         }
 
@@ -115,8 +115,6 @@ namespace WindowsConnect
             }));
         }
 
-    
-
         public void ResetProgress()
         {
             Dispatcher.Invoke(new Action(() =>
@@ -134,48 +132,13 @@ namespace WindowsConnect
             }));
         }
 
-        public void VirtualSingleTouchDown(int x, int y)
-        {
-            MouseService.setDownCoordinates(x, y);
-        }
-
-        public void VirtualSingleTouchUp(int x, int y)
-        {
-
-        }
-
-        public void VirtualSingleTouchMove(int x, int y)
+        public void VirtualTouchPadChanged(int x, int y, int action, int pointer)
         {
             Dispatcher.Invoke(new Action(() =>
             {
-                txtMouseLog.Text = $"move  x: {x} y: {y}";
-                MouseService.MoveCursor(x, y);
+                txtMouseLog.Text = $"x = {x} y = {y} action = {action} pointer = {pointer}";
             }));
-        }
-
-        public void VirtualSingleTouchLeftClick()
-        {
-            MouseService.LeftMouseClick();
-        }
-
-        public void VirtualSingleTouchRightClick()
-        {
-            MouseService.RigthMouseClick();
-        }
-
-        public void VirtualMultiTouchDown(int x, int y)
-        {
-            MouseService.setDownCoordinates(x, y);
-        }
-
-        public void VirtualMultiTouchUp(int x, int y)
-        {
-           
-        }
-
-        public void VirtualMultiTouchMove(int x, int y)
-        {
-            MouseService.MoveMouseWheel(x, y);
+            MouseService.VirtualTouchPadChanged(x, y, action, pointer);
         }
 
         public MainWindow()

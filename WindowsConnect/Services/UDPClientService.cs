@@ -77,101 +77,65 @@ namespace WindowsConnect.Services
                 while (true)
                 {
                     byte[] data = _receiver.Receive(ref remoteIp);
-                    string message = Encoding.UTF8.GetString(data);
+
+                    int command = BitConverter.ToInt32(data, 0);
+       
                     try
                     {
-                        dynamic jsonObj = JsonConvert.DeserializeObject(message);
-                        string command = jsonObj["command"];
-
-                        dynamic value = null;
+                        string message = "";
+                        dynamic jsonObj;
                         Device device = null;
-                        int x;
-                        int y;
-
                         switch (command)
                         {
-                            case "changeVolume":
-                                int volume = jsonObj["value"];
+                            case Command.VirtualTouchPadChanged:
+
+                                int x = BitConverter.ToInt32(data, 16);
+                                int y = BitConverter.ToInt32(data, 12);
+                                int a = BitConverter.ToInt32(data, 8);
+                                int p = BitConverter.ToInt32(data, 4);
+
+                                _commandController.VirtualTouchPadChanged(x, y, a, p);
+                                break;
+
+                            case Command.ChangeVolume:
+                                message = Encoding.UTF8.GetString(data, 4, data.Length - 4);
+                                jsonObj = JsonConvert.DeserializeObject(message);
+
+                                int volume = (int) jsonObj;
                                 _commandController.SetVolume(volume);
                                 break;
-                            case "sleep":
+                            case Command.Sleep:
                                 _commandController.Sleep();
                                 break;
-                            case "playStepasSound":
+                            case Command.PlayStepasSound:
                                 _commandController.PlayStepasSound();
                                 break;
-                            case "addDevice":
-                                value = jsonObj["value"];
+                            case Command.AddDevice:
+                                message = Encoding.UTF8.GetString(data, 4, data.Length - 4);
+                                jsonObj = JsonConvert.DeserializeObject(message);
                                 device = new Device()
                                 {
-                                    Name = value["Name"],
-                                    IP = value["IP"],
+                                    Name = jsonObj["Name"],
+                                    IP = jsonObj["IP"],
                                     Port = SettingsService.UDP_SEND_PORT,
                                     DateConnect = DateTime.Now
                                 };
                                 _commandController.AddDevice(device);
                                 break;
-                            case "requestAddDevice":
-                                value = jsonObj["value"];
+                            case Command.RequestAddDevice:
+                                message = Encoding.UTF8.GetString(data, 4, data.Length - 4);
+                                jsonObj = JsonConvert.DeserializeObject(message);
                                 device = new Device()
                                 {
-                                    Name = value["Name"],
-                                    IP = value["IP"],
+                                    Name = jsonObj["Name"],
+                                    IP = jsonObj["IP"],
                                     Port = SettingsService.UDP_SEND_PORT,
                                     DateConnect = DateTime.Now
                                 };
                                 _commandController.RequestAddDevice(device);
                                 break;
 
-                            case "virtualSingleTouchDown":
-                                value = jsonObj["value"];
-                                x = value["x"];
-                                y = value["y"];
-                                _commandController.VirtualSingleTouchDown(x, y);
-                                break;
-                            case "virtualSingleTouchUp":
-                                value = jsonObj["value"];
-                                 x = value["x"];
-                                 y = value["y"];
-                                _commandController.VirtualSingleTouchUp(x, y);
-                                break;
-                            case "virtualSingleTouchMove":
-                                value = jsonObj["value"];
-                                 x = value["x"];
-                                 y = value["y"];
-                                _commandController.VirtualSingleTouchMove(x, y);
-                                break;
-
-                            case "virtualSingleTouchRightClick":
-                                _commandController.VirtualSingleTouchRightClick();
-                                break; 
-                            
-                            case "virtualSingleTouchLeftClick":
-                                _commandController.VirtualSingleTouchLeftClick();
-
-                                break;
-
-                            case "virtualMultiTouchDown":
-                                value = jsonObj["value"];
-                                x = value["x"];
-                                y = value["y"];
-                                _commandController.VirtualMultiTouchDown(x, y);
-
-                                break;
-                            case "virtualMultiTouchUp":
-                                value = jsonObj["value"];
-                                x = value["x"];
-                                y = value["y"];
-                                _commandController.VirtualMultiTouchUp(x, y);
-
-                                break;
-                            case "virtualMultiTouchMove":
-                                value = jsonObj["value"];
-                                x = value["x"];
-                                y = value["y"];
-                                _commandController.VirtualMultiTouchMove(x, y);
-
-                                break;
+                          
                             default:
                                 
                                 break;

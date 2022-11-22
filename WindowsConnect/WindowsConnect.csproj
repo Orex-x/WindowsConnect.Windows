@@ -224,13 +224,13 @@
     <Compile Include="Interfaces\IException.cs" />
     <Compile Include="Interfaces\ITCPClientService.cs" />
     <Compile Include="Models\Device.cs" />
+    <Compile Include="Models\MouseEvent.cs" />
     <Compile Include="Models\MyFile.cs" />
     <Compile Include="Services\CommandHelper.cs" />
     <Compile Include="Services\MouseService.cs" />
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\QRCodeService.cs" />
     <Compile Include="Services\TCPClientService.cs" />
-    <Compile Include="Services\TcpServer.cs" />
     <Compile Include="Services\UDPClientService.cs" />
     <Compile Include="Services\VolumeService.cs" />
     <Page Include="DialogWindows\DownloadFile.xaml">

@@ -89,8 +89,8 @@ namespace WindowsConnect.Services
                 {
                     try
                     {
-                       
                         byte[] headerBuffer = new byte[4];
+                        
                         int bytesReceived = await _stream.ReadAsync(headerBuffer, 0, 4);
                         if (bytesReceived != 4)
                             continue;
@@ -99,7 +99,18 @@ namespace WindowsConnect.Services
                             Array.Reverse(headerBuffer);
 
                         int length = BitConverter.ToInt32(headerBuffer, 0);
-                       
+
+                        byte[] commandBuffer = new byte[4];
+
+                        bytesReceived = await _stream.ReadAsync(commandBuffer, 0, 4);
+                        if (bytesReceived != 4)
+                            continue;
+
+                        if (BitConverter.IsLittleEndian)
+                            Array.Reverse(commandBuffer);
+
+                        int command = BitConverter.ToInt32(commandBuffer, 0);
+
                         byte[] buffer = new byte[length];
                         int count = 0;
 
@@ -113,14 +124,12 @@ namespace WindowsConnect.Services
 
                         string buffer_string = Encoding.UTF8.GetString(buffer);
                         dynamic jsonObj = JsonConvert.DeserializeObject(buffer_string.ToString());
-                        string command = jsonObj["command"];
-
-                        dynamic value = null;
+          
                         switch (command)
                         {
-                            case "saveFile":
-                                value = jsonObj["value"];
-                                string name = value["name"];
+                            case Command.SaveFile:
+                              
+                                string name = jsonObj["name"];
                                 await uploadFileFromSocket("data\\" + name);
                                 break;
                         }
