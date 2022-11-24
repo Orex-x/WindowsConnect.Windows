@@ -55,7 +55,7 @@ namespace WindowsConnect.Services
 
         #endregion
 
-        public TCPClientService(ITCPClientService tcpClientServiceListener, Device device)
+        public TCPClientService(ITCPClientService tcpClientServiceListener)
         {
             try
             {
@@ -72,8 +72,23 @@ namespace WindowsConnect.Services
             {
                 _tcpClientServiceListener.Exception(e);
             }
-           
         }
+
+        public static bool CheckConnection(Device device)
+        {
+            try
+            {
+                using(var tcp = new TcpClient(device.IP, SettingsService.TCP_PORT))
+                {
+                    return tcp.Connected;
+                }
+            }catch(Exception ex)
+            {
+
+            }
+            return false;
+        } 
+
 
         public void SendMessage(string message)
         {
@@ -200,8 +215,6 @@ namespace WindowsConnect.Services
 
                     }
                     while (count != length);
-
-
                 }
                 _tcpClientServiceListener.ResetProgress();
                 var file = new FileInfo(name);

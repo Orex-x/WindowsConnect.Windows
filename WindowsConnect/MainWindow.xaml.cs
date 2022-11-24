@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Media;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -40,20 +41,34 @@ namespace WindowsConnect
         {
             Dispatcher.Invoke(new Action(() =>
             {
-                PlayStepasSound();
-                var result = MessageBox.Show($"Устройство {device.Name} запрашевает подключение.\n " +
-                    $"Подключить данное устройство?", "Добавление устройства", MessageBoxButton.YesNo);
-                if (result == MessageBoxResult.Yes)
+                if(_device != null)
                 {
+
                     UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
-                    _tcpClient = new TCPClientService(this, device);
-                    _device = device;
+                    _tcpClient = new TCPClientService(this);
                     txtDeviceName.Text = device.Name;
+                    txtDeviceStatus.Text = "подключен";
                     sendWallpaper(device);
                 }
                 else
                 {
-                    UDPClientService.SendMessage("500", device.IP, SettingsService.UDP_LISTEN_PORT);
+                    PlayStepasSound();
+                    var result = MessageBox.Show($"Устройство {device.Name} запрашевает подключение.\n " +
+                        $"Подключить данное устройство?", "Добавление устройства", MessageBoxButton.YesNo);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        _device = device;
+                        Database.Save(Database.DEVICE_PATH, device);
+                        UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
+                        _tcpClient = new TCPClientService(this);
+                        txtDeviceName.Text = device.Name;
+                        txtDeviceStatus.Text = "подключен";
+                        sendWallpaper(device);
+                    }
+                    else
+                    {
+                        UDPClientService.SendMessage("500", device.IP, SettingsService.UDP_LISTEN_PORT);
+                    }
                 }
             }));
         }
@@ -161,9 +176,44 @@ namespace WindowsConnect
             _udpClient = new UDPClientService(this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
-            
-/*            int w = SystemInformation.VirtualScreen.Width;
-            int h = SystemInformation.VirtualScreen.Height;*/
+            AutoConnect();
+        }
+
+        public async void AutoConnect()
+        {
+            await Task.Run(() => {
+                var device = Database.Get<Device>(Database.DEVICE_PATH);
+                if (device != null)
+                {
+                    _device = device;
+                   
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        txtDeviceName.Text = _device.Name;
+                    }));
+                    while (true)
+                    {
+                        if (TCPClientService.CheckConnection(device))
+                        {
+                            Dispatcher.Invoke(new Action(() =>
+                            {
+                                txtDeviceStatus.Text = "Шлем запрос на подключение...";
+                            }));
+                            var command = CommandHelper.CreateCommand(Command.OpenConnection, SettingsService.getHostInfo());
+                            UDPClientService.SendMessage(command, device.IP, SettingsService.UDP_SEND_PORT);
+                            break;
+                        }
+                        else
+                        {
+                            Dispatcher.Invoke(new Action(() =>
+                            {
+                                txtDeviceStatus.Text = "Не в сети";
+                            }));
+                        }
+                            
+                    }
+                }
+            });
         }
 
         private void Button_Click_Open_Folder(object sender, RoutedEventArgs e)

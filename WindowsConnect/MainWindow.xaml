@@ -20,8 +20,15 @@
         </Grid>
 
         <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
             <TextBlock Text="Device: "/>
-            <TextBlock x:Name="txtDeviceName"/>
+            <TextBlock Grid.Row="1" x:Name="txtDeviceName"/>
+            <TextBlock Grid.Row="2" x:Name="txtDeviceStatus"/>
         </Grid>
     </Grid>
 </Window>

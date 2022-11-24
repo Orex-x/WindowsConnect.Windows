@@ -68,6 +68,39 @@ namespace WindowsConnect.Services
             udp.Close();
         }
 
+        public static string SendMessageWithReceive(string message, string ip, int port)
+        {
+            try
+            {
+                IPEndPoint remoteIp = null;
+
+                var data = Encoding.UTF8.GetBytes(message);
+                var udp = new UdpClient(ip, port);
+
+                int intValue = data.Length;
+                byte[] intBytes = BitConverter.GetBytes(intValue);
+
+                if (BitConverter.IsLittleEndian)
+                    Array.Reverse(intBytes);
+
+                udp.Send(intBytes, intBytes.Length);
+                udp.Send(data, data.Length);
+
+                byte[] receiveData = udp.Receive(ref remoteIp);
+
+                message = Encoding.UTF8.GetString(receiveData, 4, receiveData.Length - 4);
+
+                udp.Close();
+
+                return message;
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return "";
+        }
+
 
         private void ReceiveMessage()
         {

@@ -19,6 +19,9 @@ namespace WindowsConnect.Services
         static int _multiplyDownX, _multiplyDownY;
         static int _bufferX, _bufferY;
 
+        int w = SystemInformation.VirtualScreen.Width;
+        int h = SystemInformation.VirtualScreen.Height;
+
         static Cursor _cursor = Cursor.Current;
 
         [DllImport("user32.dll")]

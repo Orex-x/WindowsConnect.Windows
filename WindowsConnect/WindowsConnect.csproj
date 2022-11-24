@@ -227,6 +227,7 @@
     <Compile Include="Models\MouseEvent.cs" />
     <Compile Include="Models\MyFile.cs" />
     <Compile Include="Services\CommandHelper.cs" />
+    <Compile Include="Services\Database.cs" />
     <Compile Include="Services\MouseService.cs" />
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\QRCodeService.cs" />

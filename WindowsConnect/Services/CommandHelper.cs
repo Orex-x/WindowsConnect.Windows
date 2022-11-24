@@ -30,6 +30,7 @@ namespace WindowsConnect.Services
         public const int SaveFile = 7;
         public const int VirtualTouchPadChanged = 8;
         public const int CloseConnection = 9;
+        public const int OpenConnection = 10;
 
     }
 
