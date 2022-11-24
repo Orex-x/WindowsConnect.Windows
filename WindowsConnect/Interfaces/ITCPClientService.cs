@@ -4,5 +4,6 @@
     {
         void SetProgress(int progress);
         void ResetProgress();
+        void CloseConnection();
     }
 }

@@ -15,18 +15,13 @@
             <Image x:Name="imgQRCode" Width="200" Height="200" VerticalAlignment="Top" Margin="20"/>
             <ProgressBar Height="10" VerticalAlignment="Bottom" x:Name="pbStatus" Grid.Row="1" Minimum="0" Maximum="100" Value="0"/>
             <TextBlock x:Name="txtMouseLog" VerticalAlignment="Bottom" Margin="10,0,0,20" Text="mouse log"/>
+            <Button VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="25" Width="80" Margin="10,0,0,40" Click="Button_Click_Open_Folder" Content="files"/>
+            <Button VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="25" Width="100" Margin="95,0,0,40" Click="Button_Click_Close_Connection" Content="close connection"/>
         </Grid>
 
         <Grid Grid.Column="0">
-            <ListBox x:Name="Devices">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Margin="5">
-                            <TextBlock FontSize="16" Text="{Binding Path=Name}" HorizontalAlignment="Center" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <TextBlock Text="Device: "/>
+            <TextBlock x:Name="txtDeviceName"/>
         </Grid>
     </Grid>
 </Window>

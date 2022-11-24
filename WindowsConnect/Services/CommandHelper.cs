@@ -29,13 +29,14 @@ namespace WindowsConnect.Services
         public const int PlayStepasSound = 6;
         public const int SaveFile = 7;
         public const int VirtualTouchPadChanged = 8;
+        public const int CloseConnection = 9;
 
     }
 
 
     public class CommandHelper
     {
-        public static string createCommand(int command, object obj)
+        public static string CreateCommand(int command, object obj)
         {
             var json = JsonConvert.SerializeObject(obj);
             return "{\"command\" : " + "\"" + command + "\"" + ", \"value\" : " + json + "}";

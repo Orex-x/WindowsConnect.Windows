@@ -38,6 +38,8 @@ namespace WindowsConnect.Services
             if (disposed)
                 throw new ObjectDisposedException(typeof(TCPClientService).FullName);
 
+         
+
             disposed = true;
             _listener.Stop();
 
@@ -55,28 +57,43 @@ namespace WindowsConnect.Services
 
         public TCPClientService(ITCPClientService tcpClientServiceListener, Device device)
         {
-            _tcpClientServiceListener = tcpClientServiceListener;
-            _listener = new TcpListener(IPAddress.Any, SettingsService.TCP_PORT);
-            _listener.Start();
-            _tcpClient = _listener.AcceptTcpClient();
-            _stream = _tcpClient.GetStream();
-            _remoteEndPoint = _tcpClient.Client.RemoteEndPoint;
-            _channel = Channel.CreateUnbounded<string>();
-            Receive();
+            try
+            {
+                _tcpClientServiceListener = tcpClientServiceListener;
+                _listener = new TcpListener(IPAddress.Any, SettingsService.TCP_PORT);
+                _listener.Start();
+                _tcpClient = _listener.AcceptTcpClient();
+                _stream = _tcpClient.GetStream();
+                _remoteEndPoint = _tcpClient.Client.RemoteEndPoint;
+                _channel = Channel.CreateUnbounded<string>();
+                Receive();
+            }
+            catch(Exception e)
+            {
+                _tcpClientServiceListener.Exception(e);
+            }
+           
         }
 
         public void SendMessage(string message)
         {
-            var data = Encoding.UTF8.GetBytes(message);
+            try
+            {
+                var data = Encoding.UTF8.GetBytes(message);
 
-            int intValue = data.Length;
-            byte[] intBytes = BitConverter.GetBytes(intValue);
+                int intValue = data.Length;
+                byte[] intBytes = BitConverter.GetBytes(intValue);
 
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(intBytes);
+                if (BitConverter.IsLittleEndian)
+                    Array.Reverse(intBytes);
 
-            _stream.Write(intBytes, 0, intBytes.Length);
-            _stream.Write(data, 0, data.Length);
+                _stream.Write(intBytes, 0, intBytes.Length);
+                _stream.Write(data, 0, data.Length);
+            }
+            catch(Exception e)
+            {
+                _tcpClientServiceListener.Exception(e);
+            }
         }
 
         private async void Receive()
@@ -92,6 +109,13 @@ namespace WindowsConnect.Services
                         byte[] headerBuffer = new byte[4];
                         
                         int bytesReceived = await _stream.ReadAsync(headerBuffer, 0, 4);
+                        
+                        if (bytesReceived == 0)
+                        {
+                            _tcpClientServiceListener.CloseConnection();
+                            break;
+                        }
+
                         if (bytesReceived != 4)
                             continue;
 
@@ -128,15 +152,17 @@ namespace WindowsConnect.Services
                         switch (command)
                         {
                             case Command.SaveFile:
-                              
                                 string name = jsonObj["name"];
                                 await uploadFileFromSocket("data\\" + name);
+                                break;
+                            case Command.CloseConnection:
+                                _tcpClientServiceListener.CloseConnection();
                                 break;
                         }
                     }
                     catch (Exception e)
                     {
-                        _tcpClientServiceListener.Exception(e);
+                        //_tcpClientServiceListener.Exception(e);
                     }
                 }
             });

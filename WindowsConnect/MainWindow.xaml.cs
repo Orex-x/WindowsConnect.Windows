@@ -21,7 +21,7 @@ namespace WindowsConnect
         private UDPClientService _udpClient;
         private TCPClientService _tcpClient;
         private VolumeService _volumeService;
-        private ObservableCollection<Device> _device = new ObservableCollection<Device>();
+        private Device _device;
 
 
         protected override void OnClosed(EventArgs e)
@@ -47,7 +47,8 @@ namespace WindowsConnect
                 {
                     UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
                     _tcpClient = new TCPClientService(this, device);
-                    _device.Add(device);
+                    _device = device;
+                    txtDeviceName.Text = device.Name;
                     sendWallpaper(device);
                 }
                 else
@@ -55,8 +56,6 @@ namespace WindowsConnect
                     UDPClientService.SendMessage("500", device.IP, SettingsService.UDP_LISTEN_PORT);
                 }
             }));
-
-          
         }
 
 
@@ -71,7 +70,7 @@ namespace WindowsConnect
 
                 byte[] bytes = File.ReadAllBytes(path);
                 
-                var command = CommandHelper.createCommand(Command.SetWallpaper, bytes);
+                var command = CommandHelper.CreateCommand(Command.SetWallpaper, bytes);
 
                 _tcpClient.SendMessage(command);
             }
@@ -89,7 +88,7 @@ namespace WindowsConnect
 
         public void RequestAddDevice(Device device)
         {
-            var command = CommandHelper.createCommand(Command.SetHostInfo, SettingsService.getHostInfo());
+            var command = CommandHelper.CreateCommand(Command.SetHostInfo, SettingsService.getHostInfo());
             UDPClientService.SendMessage(command, device.IP, device.Port);
         }
 
@@ -134,31 +133,47 @@ namespace WindowsConnect
 
         public void VirtualTouchPadChanged(int x, int y, int action, int pointer)
         {
-            Dispatcher.Invoke(new Action(() =>
+            Dispatcher.Invoke(new Action(() =>  
             {
                 txtMouseLog.Text = $"x = {x} y = {y} action = {action} pointer = {pointer}";
             }));
             MouseService.VirtualTouchPadChanged(x, y, action, pointer);
         }
 
+
+        public void CloseConnection()
+        {
+            var command = CommandHelper.CreateCommand(Command.CloseConnection, "");
+            _tcpClient.SendMessage(command);
+            _device = null;
+            _tcpClient.Dispose();
+            Dispatcher.Invoke(new Action(() =>
+            {
+                txtDeviceName.Text = "";
+            }));
+            
+        }
+
         public MainWindow()
         {
             InitializeComponent();
-            Devices.ItemsSource = _device;
+
             _udpClient = new UDPClientService(this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
-
-           
-
-            int w = SystemInformation.VirtualScreen.Width;
-            int h = SystemInformation.VirtualScreen.Height;
-
-            txtMouseLog.Text = "test";
-
             
+/*            int w = SystemInformation.VirtualScreen.Width;
+            int h = SystemInformation.VirtualScreen.Height;*/
+        }
 
-            // MessageBox.Show(MouseService.ShowMousePosition());
+        private void Button_Click_Open_Folder(object sender, RoutedEventArgs e)
+        {
+            Process.Start("explorer", "data\\");
+        }
+
+        private void Button_Click_Close_Connection(object sender, RoutedEventArgs e)
+        {
+            CloseConnection();
         }
     }
 }

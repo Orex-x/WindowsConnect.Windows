@@ -39,6 +39,11 @@ namespace WindowsConnect.Services
         public const int MOUSEEVENTF_RIGHTUP = 0x0010;
         private const int MOUSEEVENTF_WHEEL = 0x0800;
 
+        private const int TIME_LEFT_MOUSE_CLICK = 100;
+
+        private static bool _triplePointer = false;
+        private static int _TriplePointerY = 0;
+
 
 
         static bool hookClick = false; // для иммитации зажатой левой мышки при удержании
@@ -49,6 +54,14 @@ namespace WindowsConnect.Services
 
         public static void VirtualTouchPadChanged(int x, int y, int action, int pointer)
         {
+
+            if (pointer == 3)
+            {
+                _triplePointer = true;
+                _TriplePointerY = y;
+            }
+            
+
             switch (action)
             {
                 case MouseEvent.ACTION_MOVE:
@@ -72,6 +85,13 @@ namespace WindowsConnect.Services
                         if (!multiClick)
                             MoveCursor(x, y);
                     }
+                    if (_triplePointer)
+                    {
+                        if((_TriplePointerY) < y)
+                        {
+                            var d = "";
+                        }
+                    }
                     break;
                 case MouseEvent.ACTION_DOWN:
                    
@@ -88,13 +108,14 @@ namespace WindowsConnect.Services
                     else
                     {
                         leftClick = true;
-                        Task.Delay(50).ContinueWith(_ => { leftClick = false; });
+                        Task.Delay(TIME_LEFT_MOUSE_CLICK).ContinueWith(_ => { leftClick = false; });
                     }
 
                    
                     break;
                 case MouseEvent.ACTION_UP:
 
+                    _triplePointer = false;
                     hookClick = false;
                     doubleClick = false;
                     if (leftClick && !multiClick && !multiTouchUp)
@@ -117,7 +138,7 @@ namespace WindowsConnect.Services
                     break;
                 case MouseEvent.ACTION_POINTER_UP:
 
-                    Task.Delay(200).ContinueWith(_ => { multiTouchUp = false; });
+                    Task.Delay(300).ContinueWith(_ => { multiTouchUp = false; });
                     if (multiClick)
                     {
                         RigthMouseClick();
