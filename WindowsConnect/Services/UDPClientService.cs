@@ -68,14 +68,14 @@ namespace WindowsConnect.Services
             udp.Close();
         }
 
-        public static string SendMessageWithReceive(string message, string ip, int port)
+        public static string SendMessageWithReceive(string message, string ip)
         {
             try
             {
                 IPEndPoint remoteIp = null;
 
                 var data = Encoding.UTF8.GetBytes(message);
-                var udp = new UdpClient(ip, port);
+                var udp = new UdpClient(ip, SettingsService.UDP_SEND_PORT);
 
                 int intValue = data.Length;
                 byte[] intBytes = BitConverter.GetBytes(intValue);
@@ -85,6 +85,10 @@ namespace WindowsConnect.Services
 
                 udp.Send(intBytes, intBytes.Length);
                 udp.Send(data, data.Length);
+
+                udp.Close();
+
+                udp = new UdpClient(SettingsService.UDP_SEND_WITH_RECEIVE_PORT);
 
                 byte[] receiveData = udp.Receive(ref remoteIp);
 
@@ -143,7 +147,7 @@ namespace WindowsConnect.Services
                             case Command.PlayStepasSound:
                                 _commandController.PlayStepasSound();
                                 break;
-                            case Command.AddDevice:
+                            case Command.RequestConnectDevice:
                                 message = Encoding.UTF8.GetString(data, 4, data.Length - 4);
                                 jsonObj = JsonConvert.DeserializeObject(message);
                                 device = new Device()
@@ -153,7 +157,7 @@ namespace WindowsConnect.Services
                                     Port = SettingsService.UDP_SEND_PORT,
                                     DateConnect = DateTime.Now
                                 };
-                                _commandController.AddDevice(device);
+                                _commandController.RequestConnectDevice(device);
                                 break;
                             case Command.RequestAddDevice:
                                 message = Encoding.UTF8.GetString(data, 4, data.Length - 4);

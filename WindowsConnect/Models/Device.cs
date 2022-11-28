@@ -28,6 +28,17 @@ namespace WindowsConnect.Models
             }
         }
 
+        private string _macAddress;
+        public string MacAddress
+        {
+            get { return _macAddress; }
+            set
+            {
+                _macAddress = value;
+                OnPropertyChanged("MacAddress");
+            }
+        }
+
         private int _port;
         public int Port
         {

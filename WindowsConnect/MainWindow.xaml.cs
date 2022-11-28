@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Media;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,7 +24,7 @@ namespace WindowsConnect
         private UDPClientService _udpClient;
         private TCPClientService _tcpClient;
         private VolumeService _volumeService;
-        private Device _device;
+        private List<Device> _devices;
 
 
         protected override void OnClosed(EventArgs e)
@@ -37,18 +39,21 @@ namespace WindowsConnect
         }
 
 
-        public void AddDevice(Device device)
+        public void RequestConnectDevice(Device device)
         {
             Dispatcher.Invoke(new Action(() =>
             {
-                if(_device != null)
+                var d = _devices.FirstOrDefault(x => x.Name == device.Name);
+                if(d != null)
                 {
-
-                    UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
-                    _tcpClient = new TCPClientService(this);
-                    txtDeviceName.Text = device.Name;
-                    txtDeviceStatus.Text = "подключен";
-                    sendWallpaper(device);
+                    var command = CommandHelper.CreateCommand(Command.OpenConnection, SettingsService.getHostInfo());
+                    var answer = UDPClientService.SendMessageWithReceive(command, device.IP);
+                    if(answer == "200")
+                    {
+                        txtDeviceName.Text = device.Name;
+                        txtDeviceStatus.Text = "подключен";
+                        sendWallpaper(device);
+                    }
                 }
                 else
                 {
@@ -57,10 +62,9 @@ namespace WindowsConnect
                         $"Подключить данное устройство?", "Добавление устройства", MessageBoxButton.YesNo);
                     if (result == MessageBoxResult.Yes)
                     {
-                        _device = device;
-                        Database.Save(Database.DEVICE_PATH, device);
+                        _devices.Add(device);
+                        Database.Save(Database.DEVICE_PATH, _devices);
                         UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
-                        _tcpClient = new TCPClientService(this);
                         txtDeviceName.Text = device.Name;
                         txtDeviceStatus.Text = "подключен";
                         sendWallpaper(device);
@@ -160,62 +164,26 @@ namespace WindowsConnect
         {
             var command = CommandHelper.CreateCommand(Command.CloseConnection, "");
             _tcpClient.SendMessage(command);
-            _device = null;
             _tcpClient.Dispose();
             Dispatcher.Invoke(new Action(() =>
             {
-                txtDeviceName.Text = "";
+                txtDeviceStatus.Text = "отключен";
             }));
-            
+            _tcpClient = new TCPClientService(this);
         }
 
         public MainWindow()
         {
             InitializeComponent();
-
+            _tcpClient = new TCPClientService(this);
             _udpClient = new UDPClientService(this);
             imgQRCode.Source = QRCodeService.getQRCode();
             _volumeService = new VolumeService();
-            AutoConnect();
+            _devices = Database.Get<List<Device>>(Database.DEVICE_PATH);
+            if(_devices == null) _devices = new List<Device>();
         }
 
-        public async void AutoConnect()
-        {
-            await Task.Run(() => {
-                var device = Database.Get<Device>(Database.DEVICE_PATH);
-                if (device != null)
-                {
-                    _device = device;
-                   
-                    Dispatcher.Invoke(new Action(() =>
-                    {
-                        txtDeviceName.Text = _device.Name;
-                    }));
-                    while (true)
-                    {
-                        if (TCPClientService.CheckConnection(device))
-                        {
-                            Dispatcher.Invoke(new Action(() =>
-                            {
-                                txtDeviceStatus.Text = "Шлем запрос на подключение...";
-                            }));
-                            var command = CommandHelper.CreateCommand(Command.OpenConnection, SettingsService.getHostInfo());
-                            UDPClientService.SendMessage(command, device.IP, SettingsService.UDP_SEND_PORT);
-                            break;
-                        }
-                        else
-                        {
-                            Dispatcher.Invoke(new Action(() =>
-                            {
-                                txtDeviceStatus.Text = "Не в сети";
-                            }));
-                        }
-                            
-                    }
-                }
-            });
-        }
-
+       
         private void Button_Click_Open_Folder(object sender, RoutedEventArgs e)
         {
             Process.Start("explorer", "data\\");
@@ -224,6 +192,14 @@ namespace WindowsConnect
         private void Button_Click_Close_Connection(object sender, RoutedEventArgs e)
         {
             CloseConnection();
+        }
+
+        public void OpenConnection()
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                txtDeviceStatus.Text = "подключен";
+            }));
         }
     }
 }

@@ -5,7 +5,7 @@ namespace WindowsConnect.Services
 {
     public class Database
     {
-        public const string DEVICE_PATH = "device";
+        public const string DEVICE_PATH = "devices";
 
         public static void Save<T>(string path, T obj)
         {
@@ -18,7 +18,11 @@ namespace WindowsConnect.Services
             try
             {
                 return JsonConvert.DeserializeObject<T>(File.ReadAllText(path));
-            }catch(Exception e)
+            }catch(FileNotFoundException e)
+            {
+                File.Create(path);
+            }
+            catch(Exception e)
             {
                 
             }

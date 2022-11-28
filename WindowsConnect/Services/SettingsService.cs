@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
-using System.Linq;
+using System.Management;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -10,19 +10,81 @@ namespace WindowsConnect.Services
     {
         public const int UDP_LISTEN_PORT = 5000;
         public const int UDP_SEND_PORT = 5001;
+        public const int UDP_SEND_WITH_RECEIVE_PORT = 5002;
 
         //public const int TCP_LISTEN_PORT = 5002;
         public const int TCP_PORT = 5005;
 
+
+
+        //Определяет, является ли адаптер физическим
+        public static bool IsAdapterPhysical(string guid)
+        {
+            ManagementObjectCollection mbsList = null;
+
+            var mbs = new ManagementObjectSearcher(
+            "SELECT PhysicalAdapter FROM Win32_NetworkAdapter WHERE GUID = '" + guid + "'"
+            );
+            bool res = false;
+
+            using (mbs)
+            {
+                mbsList = mbs.Get();
+
+                foreach (var mo in mbsList)
+                {
+                    foreach (var property in mo.Properties)
+                    {
+                        if (property.Value != null)
+                        {
+                            res = (bool) property.Value;
+                            break;
+                        }
+                        else 
+                            res = false;
+                    }
+                }
+                return res;
+            }
+
+        }
+
+
+        //Получает все локальные IP-адреса
+        public static IPAddress GetIpAddress()
+        {
+            var ifs = NetworkInterface.GetAllNetworkInterfaces();
+
+            foreach (var interf in ifs)
+            {
+                var ipprop = interf.GetIPProperties();
+                if (ipprop == null) continue;
+                var unicast = ipprop.UnicastAddresses;
+                if (unicast == null) continue;
+
+                if (IsAdapterPhysical(interf.Id.ToString()))
+                {
+                    //находим первый Unicast-адрес
+                    foreach (var addr in unicast)
+                    {
+                        if (addr.Address.AddressFamily != AddressFamily.InterNetwork) continue;
+                        return addr.Address;
+                    }
+                }
+            }
+            return null;
+        }
+
+
         public static JObject getHostInfo()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
-            var hostIP = host.AddressList.ToList()
-                .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
+
+            var ipAddress = GetIpAddress();
 
             var json = new JObject();
             json["port"] = UDP_LISTEN_PORT;
-            json["localIP"] = hostIP.ToString();
+            json["localIP"] = ipAddress.ToString();
             json["name"] = host.HostName;
             json["macAddress"] = GetMACAddress();
             return json;

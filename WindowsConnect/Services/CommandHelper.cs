@@ -21,7 +21,7 @@ namespace WindowsConnect.Services
     public static class Command
     {
         public const int ChangeVolume = 0;
-        public const int AddDevice = 1;
+        public const int RequestConnectDevice = 1;
         public const int Sleep = 2;
         public const int RequestAddDevice = 3;
         public const int SetHostInfo = 4;

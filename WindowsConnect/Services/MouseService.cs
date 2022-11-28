@@ -141,7 +141,7 @@ namespace WindowsConnect.Services
                     break;
                 case MouseEvent.ACTION_POINTER_UP:
 
-                    Task.Delay(300).ContinueWith(_ => { multiTouchUp = false; });
+                    Task.Delay(500).ContinueWith(_ => { multiTouchUp = false; });
                     if (multiClick)
                     {
                         RigthMouseClick();

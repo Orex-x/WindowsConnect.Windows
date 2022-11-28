@@ -16,9 +16,9 @@ namespace WindowsConnect.Services
 
         private ITCPClientService _tcpClientServiceListener;
 
-        private readonly TcpClient _tcpClient;
-        private readonly NetworkStream _stream;
-        private readonly TcpListener _listener;
+        private TcpClient _tcpClient;
+        private NetworkStream _stream;
+        private  TcpListener _listener;
 
         private readonly Channel<string> _channel;
 
@@ -43,7 +43,7 @@ namespace WindowsConnect.Services
             disposed = true;
             _listener.Stop();
 
-            if (_tcpClient.Connected)
+            if (_tcpClient != null && _tcpClient.Connected)
             {
                 _stream.Close();
                 _tcpClient.Close();
@@ -57,21 +57,27 @@ namespace WindowsConnect.Services
 
         public TCPClientService(ITCPClientService tcpClientServiceListener)
         {
-            try
+            _tcpClientServiceListener = tcpClientServiceListener;
+            RegisterTcpService();
+        }
+
+        public async void RegisterTcpService()
+        {
+            await Task.Run(() =>
             {
-                _tcpClientServiceListener = tcpClientServiceListener;
-                _listener = new TcpListener(IPAddress.Any, SettingsService.TCP_PORT);
-                _listener.Start();
-                _tcpClient = _listener.AcceptTcpClient();
-                _stream = _tcpClient.GetStream();
-                _remoteEndPoint = _tcpClient.Client.RemoteEndPoint;
-                _channel = Channel.CreateUnbounded<string>();
-                Receive();
-            }
-            catch(Exception e)
-            {
-                _tcpClientServiceListener.Exception(e);
-            }
+                try
+                {
+                    _listener = new TcpListener(IPAddress.Any, SettingsService.TCP_PORT);
+                    _listener.Start();
+                    _tcpClient = _listener.AcceptTcpClient();
+                    _stream = _tcpClient.GetStream();
+                    Receive();
+                }
+                catch (Exception e)
+                {
+
+                }
+            });
         }
 
         public static bool CheckConnection(Device device)
@@ -168,6 +174,7 @@ namespace WindowsConnect.Services
                         {
                             case Command.SaveFile:
                                 string name = jsonObj["name"];
+                                if (!Directory.Exists("data")) Directory.CreateDirectory("data");
                                 await uploadFileFromSocket("data\\" + name);
                                 break;
                             case Command.CloseConnection:
@@ -186,9 +193,8 @@ namespace WindowsConnect.Services
 
         public async Task uploadFileFromSocket(string name)
         {
-            await Task.Run( async () =>
+            await Task.Run(async () =>
             {
-               
                 byte[] headerBuffer = new byte[8];
                 int bytesReceived = await _stream.ReadAsync(headerBuffer, 0, 8);
                 if (bytesReceived != 8)
@@ -202,7 +208,7 @@ namespace WindowsConnect.Services
                 byte[] buffer = new byte[1024];
                 long count = 0;
 
-                using (FileStream fstream = new FileStream(name, FileMode.OpenOrCreate))
+                using (var fstream = new FileStream(name, FileMode.OpenOrCreate))
                 {
                     do
                     {
@@ -217,8 +223,8 @@ namespace WindowsConnect.Services
                     while (count != length);
                 }
                 _tcpClientServiceListener.ResetProgress();
-                var file = new FileInfo(name);
-                _tcpClientServiceListener.Message($"Файл {name} сохранен по пути {file.FullName}");
+               // var file = new FileInfo(name);
+                //_tcpClientServiceListener.Message($"Файл {name} сохранен по пути {file.FullName}");
             });
         }
 
