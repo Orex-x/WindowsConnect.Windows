@@ -46,6 +46,9 @@ namespace WindowsConnect
                 var d = _devices.FirstOrDefault(x => x.Name == device.Name);
                 if(d != null)
                 {
+                    UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
+                    d.IP = device.IP;
+                    Database.Save(Database.DEVICE_PATH, _devices);
                     var command = CommandHelper.CreateCommand(Command.OpenConnection, SettingsService.getHostInfo());
                     var answer = UDPClientService.SendMessageWithReceive(command, device.IP);
                     if(answer == "200")
@@ -62,12 +65,26 @@ namespace WindowsConnect
                         $"Подключить данное устройство?", "Добавление устройства", MessageBoxButton.YesNo);
                     if (result == MessageBoxResult.Yes)
                     {
+                        UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
                         _devices.Add(device);
                         Database.Save(Database.DEVICE_PATH, _devices);
-                        UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
-                        txtDeviceName.Text = device.Name;
-                        txtDeviceStatus.Text = "подключен";
-                        sendWallpaper(device);
+                        var command = CommandHelper.CreateCommand(Command.OpenConnection, SettingsService.getHostInfo());
+                        var answer = UDPClientService.SendMessageWithReceive(command, device.IP);
+                        if (answer == "200")
+                        {
+                            txtDeviceName.Text = device.Name;
+                            txtDeviceStatus.Text = "подключен";
+                            sendWallpaper(device);
+                        }
+                        else
+                        {
+                            txtDeviceStatus.Text = "подключение не установлено (код 500)";
+                        }
+
+                        /*   UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
+                           txtDeviceName.Text = device.Name;
+                           txtDeviceStatus.Text = "подключен";
+                           sendWallpaper(device);*/
                     }
                     else
                     {
