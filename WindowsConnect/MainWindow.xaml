@@ -13,6 +13,7 @@
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="1">
             <Image x:Name="imgQRCode" Width="200" Height="200" VerticalAlignment="Top" Margin="20"/>
+            <Image x:Name="imgClipBoard" VerticalAlignment="Top" Width="100" Height="100" Margin="12,260,288,0"/>
             <ProgressBar Height="10" VerticalAlignment="Bottom" x:Name="pbStatus" Grid.Row="1" Minimum="0" Maximum="100" Value="0"/>
             <TextBlock x:Name="txtMouseLog" VerticalAlignment="Bottom" Margin="10,0,0,20" Text="mouse log"/>
             <Button VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="25" Width="80" Margin="10,0,0,40" Click="Button_Click_Open_Folder" Content="files"/>

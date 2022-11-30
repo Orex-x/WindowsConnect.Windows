@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Media;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -13,6 +13,7 @@ using WindowsConnect.Interfaces;
 using WindowsConnect.Services;
 
 using Application = System.Windows.Forms.Application;
+using Clipboard = System.Windows.Forms.Clipboard;
 using Device = WindowsConnect.Models.Device;
 using MessageBox = System.Windows.MessageBox;
 
@@ -80,11 +81,6 @@ namespace WindowsConnect
                         {
                             txtDeviceStatus.Text = "подключение не установлено (код 500)";
                         }
-
-                        /*   UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
-                           txtDeviceName.Text = device.Name;
-                           txtDeviceStatus.Text = "подключен";
-                           sendWallpaper(device);*/
                     }
                     else
                     {
@@ -192,6 +188,7 @@ namespace WindowsConnect
         public MainWindow()
         {
             InitializeComponent();
+           
             _tcpClient = new TCPClientService(this);
             _udpClient = new UDPClientService(this);
             imgQRCode.Source = QRCodeService.getQRCode();
@@ -200,7 +197,35 @@ namespace WindowsConnect
             if(_devices == null) _devices = new List<Device>();
         }
 
-       
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            // Initialize the clipboard now that we have a window soruce to use
+            var windowClipboardManager = new ClipboardService(this);
+            windowClipboardManager.ClipboardChanged += ClipboardChanged;
+        }
+
+        private void ClipboardChanged(object sender, EventArgs e)
+        {
+            // Handle your clipboard update here, debug logging example:
+            if (Clipboard.ContainsText())
+            {
+                //MessageBox.Show(Clipboard.GetText());
+            }
+
+            if (Clipboard.ContainsImage())
+            {
+                Image img = Clipboard.GetImage();
+                imgClipBoard.Source = QRCodeService.ToBitmapImage(img); 
+            }
+            if (Clipboard.ContainsAudio())
+            {
+             //   MessageBox.Show("Вы скопировали аудио");
+            }
+        }
+
+
         private void Button_Click_Open_Folder(object sender, RoutedEventArgs e)
         {
             Process.Start("explorer", "data\\");

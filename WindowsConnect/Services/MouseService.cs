@@ -43,32 +43,29 @@ namespace WindowsConnect.Services
         private const int MOUSEEVENTF_WHEEL = 0x0800;
 
         private const int TIME_LEFT_MOUSE_CLICK = 100;
-
-        private static bool _triplePointer = false;
-        private static int _TriplePointerY = 0;
-
+        private const int TIME_DOUBLE_HOOK_CLICK = 150;
+        private const int TIME_HOOK_CLICK = 150;
+        private const int TIME_MULTI_CLICK = 100;
 
 
         static bool hookClick = false; // для иммитации зажатой левой мышки при удержании
-        static bool doubleClick = false; // для иммитации зажатой левой мышки
+        static bool doubleHookClick = false; // для иммитации зажатой левой мышки  
         static bool leftClick = false; //для иммитации левого клика мыши
         static bool multiClick = false; //для иммитации правого клика мыши
-        static bool multiTouchUp = false;
+        static bool doubleUp = false; //для иммитации правого клика мыши
 
         public static void VirtualTouchPadChanged(int x, int y, int action, int pointer)
         {
-
-            if (pointer == 3)
-            {
-                _triplePointer = true;
-                _TriplePointerY = y;
-            }
-            
-
             switch (action)
             {
                 case MouseEvent.ACTION_MOVE:
-                    if (pointer > 1 || multiTouchUp)
+
+                    if (doubleUp)
+                    {
+                        doubleUp = false;
+                        setDownCoordinates(x, y);
+                    }
+                    if (pointer > 1 )
                     {
                         MoveMouseWheel(x, y);
                     }
@@ -84,27 +81,18 @@ namespace WindowsConnect.Services
                             LeftMouseClickDown();
                             hookClick = false;
                         }
-
-                        if (!multiClick)
-                            MoveCursor(x, y);
-                    }
-                    if (_triplePointer)
-                    {
-                        if((_TriplePointerY) < y)
-                        {
-                            var d = "";
-                        }
+                        
+                        MoveCursor(x, y);
                     }
                     break;
                 case MouseEvent.ACTION_DOWN:
-                   
                     setDownCoordinates(x, y);
-
                     _bufferX = x; _bufferY = y;
                     hookClick = false;
-                    Task.Delay(200).ContinueWith(_ => { hookClick = true; });
+                    Task.Delay(TIME_HOOK_CLICK).ContinueWith(_ => { hookClick = true; });
 
-                    if (doubleClick)
+                  
+                    if (doubleHookClick)
                     {
                         LeftMouseClickDown();
                     }
@@ -117,86 +105,38 @@ namespace WindowsConnect.Services
                    
                     break;
                 case MouseEvent.ACTION_UP:
-
-                    _triplePointer = false;
-                    hookClick = false;
-                    doubleClick = false;
-                    if (leftClick && !multiClick && !multiTouchUp)
-                    {
-                        doubleClick = true;
-                        Task.Delay(150).ContinueWith(_ => { doubleClick = false; });
-                        LeftMouseClick();
-                    }
-
-                    if(!multiClick && !multiTouchUp)
+                    if (!multiClick)
                     {
                         LeftMouseClickUp();
                     }
-                  
+                    hookClick = false;
+                    doubleHookClick = false;
+
+                    if (leftClick && !multiClick)
+                    {
+                        doubleHookClick = true;
+                      
+                        Task.Delay(TIME_DOUBLE_HOOK_CLICK).ContinueWith(_ => { doubleHookClick = false; });
+                        LeftMouseClick();
+                    }
+
                     break;
                 case MouseEvent.ACTION_POINTER_DOWN:
-                    multiTouchUp = true;
                     multiClick = true;
-                    Task.Delay(50).ContinueWith(_ => { multiClick = false; });
+                    Task.Delay(TIME_MULTI_CLICK).ContinueWith(_ => {
+                        multiClick = false;
+                    });
                     break;
                 case MouseEvent.ACTION_POINTER_UP:
-
-                    Task.Delay(500).ContinueWith(_ => { multiTouchUp = false; });
+                    doubleUp = true;
+                    setDownCoordinates(x, y);
                     if (multiClick)
                     {
                         RigthMouseClick();
                     }
                    
-
                     break;
             }
-        }
-
-  
-        public static void SetMousePosition()
-        {
-            POINT point;
-            if (GetCursorPos(out point) && point.X != _x && point.Y != _y)
-            {
-                _x = point.X;
-                _y = point.Y;
-            }
-        }
-
-        private static void LeftMouseClick()
-        {
-            //SetMousePosition();
-            mouse_event(MOUSEEVENTF_LEFTDOWN, _x, _y, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTUP, _x, _y, 0, 0);
-        }
-
-        private static void RigthMouseClick()
-        {
-            SetMousePosition();
-            mouse_event(MOUSEEVENTF_RIGHTDOWN, _x, _y, 0, 0);
-            mouse_event(MOUSEEVENTF_RIGHTUP, _x, _y, 0, 0);
-        }
-
-        private static void LeftMouseClickDown()
-        {
-           // SetMousePosition();
-            mouse_event(MOUSEEVENTF_LEFTDOWN, _x, _y, 0, 0);
-        } 
-
-        private static void LeftMouseClickUp()
-        {
-            //SetMousePosition();
-            mouse_event(MOUSEEVENTF_LEFTUP, _x, _y, 0, 0);
-        }
-
-        private static void setDownCoordinates(int x, int y)
-        {
-            SetMousePosition();
-            _singleDownX = x;
-            _singleDownY = y;
-
-            _multiplyDownX = x;
-            _multiplyDownY = y;
         }
 
         private static void MoveCursor(int x, int y)
@@ -210,6 +150,49 @@ namespace WindowsConnect.Services
             SetCursorPos(p.X, p.Y);
         }
 
+        public static void SetMousePosition()
+        {
+            POINT point;
+            if (GetCursorPos(out point) && point.X != _x && point.Y != _y)
+            {
+                _x = point.X;
+                _y = point.Y;
+            }
+        }
+
+        private static void setDownCoordinates(int x, int y)
+        {
+            SetMousePosition();
+            _singleDownX = x;
+            _singleDownY = y;
+
+            _multiplyDownX = x;
+            _multiplyDownY = y;
+        }
+
+        private static void LeftMouseClick()
+        {
+            mouse_event(MOUSEEVENTF_LEFTDOWN, _x, _y, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTUP, _x, _y, 0, 0);
+        }
+
+        private static void RigthMouseClick()
+        {
+            mouse_event(MOUSEEVENTF_RIGHTDOWN, _x, _y, 0, 0);
+            mouse_event(MOUSEEVENTF_RIGHTUP, _x, _y, 0, 0);
+        }
+
+        private static void LeftMouseClickDown()
+        {
+            mouse_event(MOUSEEVENTF_LEFTDOWN, _x, _y, 0, 0);
+        } 
+
+        private static void LeftMouseClickUp()
+        {
+ 
+            mouse_event(MOUSEEVENTF_LEFTUP, _x, _y, 0, 0);
+        }
+ 
         private static void MoveMouseWheel(int x, int y)
         {
             int a = (int)((y - _multiplyDownY) * 2);

@@ -45,5 +45,30 @@ namespace WindowsConnect.Services
                 return bitmapImage;
             }
         }
+
+        public static BitmapImage ToBitmapImage(Image img)
+        {
+            try
+            {
+                using (var memory = new MemoryStream())
+                {
+                    img.Save(memory, ImageFormat.Png);
+                    memory.Position = 0;
+
+                    var bitmapImage = new BitmapImage();
+                    bitmapImage.BeginInit();
+                    bitmapImage.StreamSource = memory;
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.EndInit();
+
+                    return bitmapImage;
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return new BitmapImage();
+        }
     }
 }
