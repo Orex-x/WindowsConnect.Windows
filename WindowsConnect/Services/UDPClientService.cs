@@ -1,13 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Drawing;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 using WindowsConnect.Interfaces;
 using WindowsConnect.Models;
 

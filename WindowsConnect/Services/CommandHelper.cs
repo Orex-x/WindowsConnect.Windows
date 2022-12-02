@@ -31,6 +31,7 @@ namespace WindowsConnect.Services
         public const int VirtualTouchPadChanged = 8;
         public const int CloseConnection = 9;
         public const int OpenConnection = 10;
+        public const int SetTextClipBoard = 11;
 
     }
 

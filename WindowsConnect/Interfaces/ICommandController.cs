@@ -9,7 +9,6 @@ namespace WindowsConnect.Interfaces
         void Sleep();
         void PlayStepasSound();
         void RequestAddDevice(Device device);
-
         void VirtualTouchPadChanged(int x, int y, int action, int pointer);
     }
 }

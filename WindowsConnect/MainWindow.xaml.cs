@@ -26,6 +26,7 @@ namespace WindowsConnect
         private TCPClientService _tcpClient;
         private VolumeService _volumeService;
         private List<Device> _devices;
+        private bool isConnect = false;
 
 
         protected override void OnClosed(EventArgs e)
@@ -57,6 +58,7 @@ namespace WindowsConnect
                         txtDeviceName.Text = device.Name;
                         txtDeviceStatus.Text = "подключен";
                         sendWallpaper(device);
+                        isConnect = true;
                     }
                 }
                 else
@@ -76,6 +78,7 @@ namespace WindowsConnect
                             txtDeviceName.Text = device.Name;
                             txtDeviceStatus.Text = "подключен";
                             sendWallpaper(device);
+                            isConnect = true;
                         }
                         else
                         {
@@ -183,6 +186,7 @@ namespace WindowsConnect
                 txtDeviceStatus.Text = "отключен";
             }));
             _tcpClient = new TCPClientService(this);
+            isConnect = false;
         }
 
         public MainWindow()
@@ -208,20 +212,24 @@ namespace WindowsConnect
 
         private void ClipboardChanged(object sender, EventArgs e)
         {
-            // Handle your clipboard update here, debug logging example:
-            if (Clipboard.ContainsText())
+            if (isConnect)
             {
-                //MessageBox.Show(Clipboard.GetText());
-            }
+                if (Clipboard.ContainsText())
+                {
+                    var text = Clipboard.GetText();
+                    var command = CommandHelper.CreateCommand(Command.SetTextClipBoard, text);
+                    _tcpClient.SendMessage(command);
+                }
 
-            if (Clipboard.ContainsImage())
-            {
-                Image img = Clipboard.GetImage();
-                imgClipBoard.Source = QRCodeService.ToBitmapImage(img); 
-            }
-            if (Clipboard.ContainsAudio())
-            {
-             //   MessageBox.Show("Вы скопировали аудио");
+                if (Clipboard.ContainsImage())
+                {
+                    Image img = Clipboard.GetImage();
+                    imgClipBoard.Source = QRCodeService.ToBitmapImage(img);
+                }
+                if (Clipboard.ContainsAudio())
+                {
+                    //   MessageBox.Show("Вы скопировали аудио");
+                }
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Management;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -20,35 +21,26 @@ namespace WindowsConnect.Services
         //Определяет, является ли адаптер физическим
         public static bool IsAdapterPhysical(string guid)
         {
-            ManagementObjectCollection mbsList = null;
+            //create a management scope object
+            var scope = new ManagementScope("\\\\.\\ROOT\\StandardCimv2");
 
-            var mbs = new ManagementObjectSearcher(
-            "SELECT PhysicalAdapter FROM Win32_NetworkAdapter WHERE GUID = '" + guid + "'"
-            );
-            bool res = false;
+            //create object query
+            var query = new ObjectQuery($"SELECT * FROM MSFT_NetAdapter Where DeviceID=\"{guid}\"");
 
-            using (mbs)
+            //create object searcher
+            var searcher = new ManagementObjectSearcher(scope, query);
+
+            //get a collection of WMI objects
+            var queryCollection = searcher.Get();
+
+            //enumerate the collection.
+            foreach (var m in queryCollection)
             {
-                mbsList = mbs.Get();
-
-                foreach (var mo in mbsList)
-                {
-                    foreach (var property in mo.Properties)
-                    {
-                        if (property.Value != null)
-                        {
-                            res = (bool) property.Value;
-                            break;
-                        }
-                        else 
-                            res = false;
-                    }
-                }
-                return res;
+                bool v = (bool) m["Virtual"];
+                return !v;
             }
-
+            return false;
         }
-
 
         //Получает все локальные IP-адреса
         public static IPAddress GetIpAddress()
@@ -64,6 +56,7 @@ namespace WindowsConnect.Services
 
                 if (IsAdapterPhysical(interf.Id.ToString()))
                 {
+     
                     //находим первый Unicast-адрес
                     foreach (var addr in unicast)
                     {
@@ -81,6 +74,7 @@ namespace WindowsConnect.Services
             var host = Dns.GetHostEntry(Dns.GetHostName());
 
             var ipAddress = GetIpAddress();
+           
 
             var json = new JObject();
             json["port"] = UDP_LISTEN_PORT;
