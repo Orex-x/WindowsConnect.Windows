@@ -118,6 +118,8 @@ namespace WindowsConnect.Services
                         string message = "";
                         dynamic jsonObj;
                         Device device = null;
+                        int code;
+
                         switch (command)
                         {
                             case Command.VirtualTouchPadChanged:
@@ -128,6 +130,21 @@ namespace WindowsConnect.Services
                                 int p = BitConverter.ToInt32(data, 4);
 
                                 _commandController.VirtualTouchPadChanged(x, y, a, p);
+                                break;
+                            
+                            case Command.СlickButtonCSCTE:
+                                 code = BitConverter.ToInt32(data, 4);
+                                _commandController.ClickButtonCSCTE(code);
+                                break;
+
+                            case Command.DownButtonCSCTE:
+                                 code = BitConverter.ToInt32(data, 4);
+                                _commandController.DownButtonCSCTE(code);
+                                break;
+
+                            case Command.UpButtonCSCTE:
+                                 code = BitConverter.ToInt32(data, 4);
+                                _commandController.UpButtonCSCTE(code);
                                 break;
 
                             case Command.ChangeVolume:

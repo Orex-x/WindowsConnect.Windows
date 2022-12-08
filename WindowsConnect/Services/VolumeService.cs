@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace WindowsConnect.Services
 {
@@ -14,14 +15,21 @@ namespace WindowsConnect.Services
         CoreAudioDevice _defaultPlaybackDevice;
         public VolumeService()
         {
-            _defaultPlaybackDevice = new CoreAudioController().DefaultPlaybackDevice;
+            try
+            {
+                _defaultPlaybackDevice = new CoreAudioController().DefaultPlaybackDevice;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Exception {e.Message}");
+            }
         }
 
         public void setVolume(int volume)
         {
-            if(volume >= 0 && volume <= 100)
+            if(_defaultPlaybackDevice != null)
             {
-                _defaultPlaybackDevice.Volume = volume;
+                if (volume >= 0 && volume <= 100) _defaultPlaybackDevice.Volume = volume;
             }
         }
     }

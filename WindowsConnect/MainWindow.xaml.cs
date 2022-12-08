@@ -22,6 +22,7 @@ namespace WindowsConnect
 {
     public partial class MainWindow : Window, ICommandController, IException, ITCPClientService
     {
+        private KeyboardService _keyboardService;
         private UDPClientService _udpClient;
         private TCPClientService _tcpClient;
         private VolumeService _volumeService;
@@ -196,7 +197,9 @@ namespace WindowsConnect
             _tcpClient = new TCPClientService(this);
             _udpClient = new UDPClientService(this);
             imgQRCode.Source = QRCodeService.getQRCode();
-            _volumeService = new VolumeService();
+          //  _volumeService = new VolumeService();
+            _keyboardService = new KeyboardService();
+
             _devices = Database.Get<List<Device>>(Database.DEVICE_PATH);
             if(_devices == null) _devices = new List<Device>();
         }
@@ -250,6 +253,21 @@ namespace WindowsConnect
             {
                 txtDeviceStatus.Text = "подключен";
             }));
+        }
+
+        public void ClickButtonCSCTE(int code)
+        {
+            _keyboardService.press(code);
+        }
+
+        public void DownButtonCSCTE(int code)
+        {
+            _keyboardService.down(code);
+        }
+
+        public void UpButtonCSCTE(int code)
+        {
+            _keyboardService.up(code);
         }
     }
 }
