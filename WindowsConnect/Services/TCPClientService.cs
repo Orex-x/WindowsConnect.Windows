@@ -113,7 +113,7 @@ namespace WindowsConnect.Services
             }
             catch(Exception e)
             {
-                _tcpClientServiceListener.Exception(e);
+               // _tcpClientServiceListener.Exception(e);
             }
         }
 

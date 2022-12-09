@@ -13,14 +13,14 @@ namespace WindowsConnect.Services
         public KeyboardService()
         {
             _inputSimulator = new InputSimulator();
-            
         }
 
-        public void press(int code)
+
+        public void press(char ch)
         {
             try
             {
-                _inputSimulator.Keyboard.KeyPress((WindowsInput.Native.VirtualKeyCode)code);
+                _inputSimulator.Keyboard.TextEntry(ch);
             }
             catch (Exception ex)
             {
@@ -32,7 +32,7 @@ namespace WindowsConnect.Services
         {
             try
             {
-                _inputSimulator.Keyboard.KeyDown((WindowsInput.Native.VirtualKeyCode)code);
+                _inputSimulator.Keyboard.KeyDown((WindowsInput.Native.VirtualKeyCode) code);
             }
             catch (Exception ex)
             {
@@ -44,7 +44,7 @@ namespace WindowsConnect.Services
         {
             try
             {
-                _inputSimulator.Keyboard.KeyUp((WindowsInput.Native.VirtualKeyCode)code);
+                _inputSimulator.Keyboard.KeyUp((WindowsInput.Native.VirtualKeyCode) code);
             }
             catch (Exception ex)
             {

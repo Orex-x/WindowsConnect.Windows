@@ -131,20 +131,20 @@ namespace WindowsConnect.Services
 
                                 _commandController.VirtualTouchPadChanged(x, y, a, p);
                                 break;
-                            
-                            case Command.СlickButtonCSCTE:
+
+                            case Command.KeyboardPress:
+                                char c = BitConverter.ToChar(data, 4);
+                                _commandController.KeyboardPress(c); //для символов
+                                break; 
+
+                            case Command.DownKeyboardHardwareKeyPress:
                                  code = BitConverter.ToInt32(data, 4);
-                                _commandController.ClickButtonCSCTE(code);
+                                _commandController.DownKeyboardHardwareKeyPress(code); // для кнопок Ctrl, Shift, Caps, Tab, ESC 
                                 break;
 
-                            case Command.DownButtonCSCTE:
+                            case Command.UpKeyboardHardwareKeyPress:
                                  code = BitConverter.ToInt32(data, 4);
-                                _commandController.DownButtonCSCTE(code);
-                                break;
-
-                            case Command.UpButtonCSCTE:
-                                 code = BitConverter.ToInt32(data, 4);
-                                _commandController.UpButtonCSCTE(code);
+                                _commandController.UpKeyboardHardwareKeyPress(code); // для кнопок Ctrl, Shift, Caps, Tab, ESC 
                                 break;
 
                             case Command.ChangeVolume:
@@ -154,12 +154,15 @@ namespace WindowsConnect.Services
                                 int volume = (int) jsonObj;
                                 _commandController.SetVolume(volume);
                                 break;
+
                             case Command.Sleep:
                                 _commandController.Sleep();
                                 break;
+
                             case Command.PlayStepasSound:
                                 _commandController.PlayStepasSound();
                                 break;
+
                             case Command.RequestConnectDevice:
                                 message = Encoding.UTF8.GetString(data, 4, data.Length - 4);
                                 jsonObj = JsonConvert.DeserializeObject(message);
@@ -172,6 +175,7 @@ namespace WindowsConnect.Services
                                 };
                                 _commandController.RequestConnectDevice(device);
                                 break;
+
                             case Command.RequestAddDevice:
                                 message = Encoding.UTF8.GetString(data, 4, data.Length - 4);
                                 jsonObj = JsonConvert.DeserializeObject(message);
@@ -185,7 +189,6 @@ namespace WindowsConnect.Services
                                 _commandController.RequestAddDevice(device);
                                 break;
 
-                          
                             default:
                                 
                                 break;

@@ -33,9 +33,11 @@ namespace WindowsConnect.Services
         public const int OpenConnection = 10;
         public const int SetTextClipBoard = 11;
 
-        public const int СlickButtonCSCTE = 12;
-        public const int DownButtonCSCTE = 13;
-        public const int UpButtonCSCTE = 14;
+
+        public const int KeyboardPress = 12;
+        public const int DownKeyboardHardwareKeyPress = 13;
+        public const int UpKeyboardHardwareKeyPress = 14;
+       
 
     }
 

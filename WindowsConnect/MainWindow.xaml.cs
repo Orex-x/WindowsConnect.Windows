@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.EMMA;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -255,19 +256,21 @@ namespace WindowsConnect
             }));
         }
 
-        public void ClickButtonCSCTE(int code)
-        {
-            _keyboardService.press(code);
-        }
 
-        public void DownButtonCSCTE(int code)
+
+        public void DownKeyboardHardwareKeyPress(int code)
         {
             _keyboardService.down(code);
         }
 
-        public void UpButtonCSCTE(int code)
+        public void UpKeyboardHardwareKeyPress(int code)
         {
             _keyboardService.up(code);
+        }
+
+        public void KeyboardPress(char ch)
+        {
+            _keyboardService.press(ch); 
         }
     }
 }

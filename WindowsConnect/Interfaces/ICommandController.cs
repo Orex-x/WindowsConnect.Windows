@@ -10,9 +10,11 @@ namespace WindowsConnect.Interfaces
         void PlayStepasSound();
         void RequestAddDevice(Device device);
         void VirtualTouchPadChanged(int x, int y, int action, int pointer);
-        void ClickButtonCSCTE(int code);
 
-        void DownButtonCSCTE(int code);
-        void UpButtonCSCTE(int code);
+
+
+        void KeyboardPress(char ch);
+        void DownKeyboardHardwareKeyPress(int code);
+        void UpKeyboardHardwareKeyPress(int code);
     }
 }
