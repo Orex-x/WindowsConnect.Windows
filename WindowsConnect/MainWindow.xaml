@@ -5,31 +5,75 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WindowsConnect"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="WindowsConnect" Height="350" Width="250">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="1">
-            <Image x:Name="imgQRCode" Width="200" Height="200" VerticalAlignment="Top" Margin="20"/>
-            <Image x:Name="imgClipBoard" VerticalAlignment="Top" Width="100" Height="100" Margin="12,260,288,0"/>
-            <ProgressBar Height="10" VerticalAlignment="Bottom" x:Name="pbStatus" Grid.Row="1" Minimum="0" Maximum="100" Value="0"/>
-            <TextBlock x:Name="txtMouseLog" VerticalAlignment="Bottom" Margin="10,0,0,20" Text="mouse log"/>
-            <Button VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="25" Width="80" Margin="10,0,0,40" Click="Button_Click_Open_Folder" Content="files"/>
-            <Button VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="25" Width="100" Margin="95,0,0,40" Click="Button_Click_Close_Connection" Content="close connection"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="200"/>
+            <RowDefinition/>
+            <RowDefinition Height="2"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock 
+            x:Name="txtIP"
+            Text="IP" 
+            FontFamily="Arial"
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Center"/>
+        
+        <Image
+            x:Name="imgQRCode" 
+            Grid.Row="1"
+            Margin="10"
+            Width="200"/>
+
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="15"/>
+                <RowDefinition/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock 
+                x:Name="txtDeviceName"
+                Margin="5,0,5,0"
+                FontSize="14"
+                FontFamily="Arial"
+                Text=""/>
+
+            <TextBlock 
+                x:Name="txtDeviceStatus"
+                Grid.Row="1"
+                Margin="5,0,5,0"
+                FontSize="10"
+                FontFamily="Arial"
+                Text=""/>
+            
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                
+                <Button 
+                    Click="Button_Click_Open_Folder"
+                    Margin="3"
+                    Content="файлы"/>
+
+                <Button 
+                    Click="Button_Click_Close_Connection" 
+                    Margin="3"
+                    Grid.Column="1"
+                    Content="отключится"/>
+            </Grid>
         </Grid>
 
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="50"/>
-                <RowDefinition Height="50"/>
-                <RowDefinition Height="50"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="Device: "/>
-            <TextBlock Grid.Row="1" x:Name="txtDeviceName"/>
-            <TextBlock Grid.Row="2" x:Name="txtDeviceStatus"/>
-        </Grid>
+        <ProgressBar 
+            x:Name="pbStatus" 
+            Grid.Row="3" 
+            Minimum="0" 
+            Maximum="100" 
+            Value="0"/>
     </Grid>
 </Window>

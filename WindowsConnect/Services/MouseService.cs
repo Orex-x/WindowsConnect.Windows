@@ -19,8 +19,8 @@ namespace WindowsConnect.Services
         static int _multiplyDownX, _multiplyDownY;
         static int _bufferX, _bufferY;
 
-        int w = SystemInformation.VirtualScreen.Width;
-        int h = SystemInformation.VirtualScreen.Height;
+        int _screenWidth = SystemInformation.VirtualScreen.Width;
+        int _screenHeight = SystemInformation.VirtualScreen.Height;
 
         static Cursor _cursor = Cursor.Current;
 

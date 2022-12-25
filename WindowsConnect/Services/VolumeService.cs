@@ -1,4 +1,5 @@
 ﻿using AudioSwitcher.AudioApi.CoreAudio;
+using DocumentFormat.OpenXml.Bibliography;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,11 +26,19 @@ namespace WindowsConnect.Services
             }
         }
 
-        public void setVolume(int volume)
+        public void SetVolume(int volume)
         {
             if(_defaultPlaybackDevice != null)
             {
                 if (volume >= 0 && volume <= 100) _defaultPlaybackDevice.Volume = volume;
+            }
+        }
+
+        public void Pause()
+        {
+            if (_defaultPlaybackDevice != null)
+            {
+                
             }
         }
     }

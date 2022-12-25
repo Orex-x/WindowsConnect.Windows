@@ -1,4 +1,6 @@
 ﻿using DocumentFormat.OpenXml.EMMA;
+using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,7 +41,7 @@ namespace WindowsConnect
 
         public void SetVolume(int volume)
         {
-            _volumeService.setVolume(volume);
+            _volumeService.SetVolume(volume);
         }
 
 
@@ -170,10 +172,6 @@ namespace WindowsConnect
 
         public void VirtualTouchPadChanged(int x, int y, int action, int pointer)
         {
-            Dispatcher.Invoke(new Action(() =>  
-            {
-                txtMouseLog.Text = $"x = {x} y = {y} action = {action} pointer = {pointer}";
-            }));
             MouseService.VirtualTouchPadChanged(x, y, action, pointer);
         }
 
@@ -187,22 +185,33 @@ namespace WindowsConnect
             {
                 txtDeviceStatus.Text = "отключен";
             }));
-            _tcpClient = new TCPClientService(this);
             isConnect = false;
+            _tcpClient = new TCPClientService(this);
         }
 
         public MainWindow()
         {
             InitializeComponent();
-           
+
+            if (!Directory.Exists("data")) Directory.CreateDirectory("data");
+
+            var h = SettingsService.getHostInfo();
+            txtIP.Text = $"IP: {h["localIP"]}";
+
+
+          /*  var rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            rkApp.SetValue("Windows Connect", Application.ExecutablePath.ToString());*/
+
             _tcpClient = new TCPClientService(this);
             _udpClient = new UDPClientService(this);
             imgQRCode.Source = QRCodeService.getQRCode();
-          //  _volumeService = new VolumeService();
+            _volumeService = new VolumeService();
             _keyboardService = new KeyboardService();
 
             _devices = Database.Get<List<Device>>(Database.DEVICE_PATH);
-            if(_devices == null) _devices = new List<Device>();
+
+            if(_devices == null) 
+                _devices = new List<Device>();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -228,7 +237,7 @@ namespace WindowsConnect
                 if (Clipboard.ContainsImage())
                 {
                     Image img = Clipboard.GetImage();
-                    imgClipBoard.Source = QRCodeService.ToBitmapImage(img);
+                   // imgClipBoard.Source = QRCodeService.ToBitmapImage(img);
                 }
                 if (Clipboard.ContainsAudio())
                 {

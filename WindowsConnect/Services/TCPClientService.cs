@@ -38,8 +38,6 @@ namespace WindowsConnect.Services
             if (disposed)
                 throw new ObjectDisposedException(typeof(TCPClientService).FullName);
 
-         
-
             disposed = true;
             _listener.Stop();
 
@@ -113,7 +111,7 @@ namespace WindowsConnect.Services
             }
             catch(Exception e)
             {
-               // _tcpClientServiceListener.Exception(e);
+                _tcpClientServiceListener.Exception(e);
             }
         }
 
@@ -174,7 +172,6 @@ namespace WindowsConnect.Services
                         {
                             case Command.SaveFile:
                                 string name = jsonObj["name"];
-                                if (!Directory.Exists("data")) Directory.CreateDirectory("data");
                                 await uploadFileFromSocket("data\\" + name);
                                 break;
                             case Command.CloseConnection:
@@ -223,19 +220,7 @@ namespace WindowsConnect.Services
                     while (count != length);
                 }
                 _tcpClientServiceListener.ResetProgress();
-               // var file = new FileInfo(name);
-                //_tcpClientServiceListener.Message($"Файл {name} сохранен по пути {file.FullName}");
             });
-        }
-
-        private void WriteBytes(Stream streamToRead, Stream streamToWrite)
-        {
-                byte[] buffer = new byte[1024];
-                int nRead = 0;
-                while ((nRead = streamToRead.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    streamToWrite.Write(buffer, 0, nRead);
-                }
         }
 
         public long getProgress(long sum, long value)
