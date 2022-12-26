@@ -9,6 +9,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Media;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -98,7 +100,7 @@ namespace WindowsConnect
         }
 
 
-        private void sendWallpaper(Device device)
+        private async void sendWallpaper(Device device)
         {
             try
             {
@@ -108,10 +110,10 @@ namespace WindowsConnect
                     "Microsoft\\Windows\\Themes\\TranscodedWallpaper");
 
                 byte[] bytes = File.ReadAllBytes(path);
-                
-                var command = CommandHelper.CreateCommand(Command.SetWallpaper, bytes);
 
-                _tcpClient.SendMessage(command);
+                await Task.Run(() => {
+                    _tcpClient.SendMessage(bytes, Command.SetWallpaper, true);
+                });
             }
             catch (Exception e)
             {
@@ -178,8 +180,7 @@ namespace WindowsConnect
 
         public void CloseConnection()
         {
-            var command = CommandHelper.CreateCommand(Command.CloseConnection, "");
-            _tcpClient.SendMessage(command);
+            _tcpClient.SendMessage(Command.CloseConnection);
             _tcpClient.Dispose();
             Dispatcher.Invoke(new Action(() =>
             {
@@ -217,8 +218,6 @@ namespace WindowsConnect
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
-
-            // Initialize the clipboard now that we have a window soruce to use
             var windowClipboardManager = new ClipboardService(this);
             windowClipboardManager.ClipboardChanged += ClipboardChanged;
         }
@@ -230,18 +229,16 @@ namespace WindowsConnect
                 if (Clipboard.ContainsText())
                 {
                     var text = Clipboard.GetText();
-                    var command = CommandHelper.CreateCommand(Command.SetTextClipBoard, text);
-                    _tcpClient.SendMessage(command);
+                    _tcpClient.SendMessage(Encoding.UTF8.GetBytes(text), Command.SetTextClipBoard, false);
                 }
 
                 if (Clipboard.ContainsImage())
                 {
-                    Image img = Clipboard.GetImage();
-                   // imgClipBoard.Source = QRCodeService.ToBitmapImage(img);
+                    var img = Clipboard.GetImage();
                 }
                 if (Clipboard.ContainsAudio())
                 {
-                    //   MessageBox.Show("Вы скопировали аудио");
+
                 }
             }
         }

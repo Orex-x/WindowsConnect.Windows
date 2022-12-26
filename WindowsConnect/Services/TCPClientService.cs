@@ -78,38 +78,54 @@ namespace WindowsConnect.Services
             });
         }
 
-        public static bool CheckConnection(Device device)
+        public bool CheckConnection()
         {
-            try
-            {
-                using(var tcp = new TcpClient(device.IP, SettingsService.TCP_PORT))
-                {
-                    return tcp.Connected;
-                }
-            }catch(Exception ex)
-            {
-
-            }
-            return false;
+          return _tcpClient != null && _tcpClient.Connected;
         } 
 
 
-        public void SendMessage(string message)
+        public void SendMessage(byte[] data, int command, bool repeat)
+        {
+            do
+            {
+                if (_stream != null)
+                {
+                    try
+                    {
+                        byte[] length = BitConverter.GetBytes(data.Length);
+                        byte[] commandB = BitConverter.GetBytes(command);
+
+                        if (BitConverter.IsLittleEndian)
+                            Array.Reverse(length);
+
+                        if (BitConverter.IsLittleEndian)
+                            Array.Reverse(commandB);
+
+                        _stream.Write(commandB, 0, commandB.Length);
+                        _stream.Write(length, 0, length.Length);
+                        _stream.Write(data, 0, data.Length);
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        _tcpClientServiceListener.Exception(e);
+                    }
+                }
+            } while (repeat); 
+        }
+
+        public void SendMessage(int command)
         {
             try
             {
-                var data = Encoding.UTF8.GetBytes(message);
-
-                int intValue = data.Length;
-                byte[] intBytes = BitConverter.GetBytes(intValue);
+                byte[] commandB = BitConverter.GetBytes(command);
 
                 if (BitConverter.IsLittleEndian)
-                    Array.Reverse(intBytes);
+                    Array.Reverse(commandB);
 
-                _stream.Write(intBytes, 0, intBytes.Length);
-                _stream.Write(data, 0, data.Length);
+                _stream.Write(commandB, 0, commandB.Length);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _tcpClientServiceListener.Exception(e);
             }
