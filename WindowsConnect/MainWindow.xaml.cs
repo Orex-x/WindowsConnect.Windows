@@ -206,7 +206,7 @@ namespace WindowsConnect
             _tcpClient = new TCPClientService(this);
             _udpClient = new UDPClientService(this);
             imgQRCode.Source = QRCodeService.getQRCode();
-            _volumeService = new VolumeService();
+          //  _volumeService = new VolumeService();
             _keyboardService = new KeyboardService();
 
             _devices = Database.Get<List<Device>>(Database.DEVICE_PATH);

@@ -141,54 +141,21 @@ namespace WindowsConnect.Services
                 {
                     try
                     {
-                        byte[] headerBuffer = new byte[4];
-                        
-                        int bytesReceived = await _stream.ReadAsync(headerBuffer, 0, 4);
-                        
-                        if (bytesReceived == 0)
-                        {
-                            _tcpClientServiceListener.CloseConnection();
-                            break;
-                        }
+                        int command = await Read4Bytes();
+                        if (command == 0) continue;
+                        if (command == -1) break;
 
-                        if (bytesReceived != 4)
-                            continue;
-
-                        if (BitConverter.IsLittleEndian)
-                            Array.Reverse(headerBuffer);
-
-                        int length = BitConverter.ToInt32(headerBuffer, 0);
-
-                        byte[] commandBuffer = new byte[4];
-
-                        bytesReceived = await _stream.ReadAsync(commandBuffer, 0, 4);
-                        if (bytesReceived != 4)
-                            continue;
-
-                        if (BitConverter.IsLittleEndian)
-                            Array.Reverse(commandBuffer);
-
-                        int command = BitConverter.ToInt32(commandBuffer, 0);
-
-                        byte[] buffer = new byte[length];
-                        int count = 0;
-
-                        do
-                        {
-                            bytesReceived = await _stream.ReadAsync(buffer, count, buffer.Length - count);
-                            count += bytesReceived;
-                            if(count > length) break;
-                        }
-                        while (count != length);
-
-                        string buffer_string = Encoding.UTF8.GetString(buffer);
-                        dynamic jsonObj = JsonConvert.DeserializeObject(buffer_string.ToString());
-          
                         switch (command)
                         {
                             case Command.SaveFile:
-                                string name = jsonObj["name"];
-                                await uploadFileFromSocket("data\\" + name);
+
+                                int length = await Read4Bytes();
+
+                                byte[] data = await ReadBytes(length);
+
+                                string fileName = Encoding.UTF8.GetString(data);
+
+                                await uploadFileFromSocket("data\\" + fileName);
                                 break;
                             case Command.CloseConnection:
                                 _tcpClientServiceListener.CloseConnection();
@@ -202,6 +169,43 @@ namespace WindowsConnect.Services
                 }
             });
            
+        }
+
+        public async Task<byte[]> ReadBytes(int length)
+        {
+            byte[] buffer = new byte[length];
+            int count = 0;
+            int bytesReceived;
+            do
+            {
+                bytesReceived = await _stream.ReadAsync(buffer, count, buffer.Length - count);
+                count += bytesReceived;
+                if (count > length) break;
+            }
+            while (count != length);
+
+            return buffer;
+        }
+
+
+        public async Task<int> Read4Bytes()
+        {
+            byte[] buffer = new byte[4];
+            int bytesReceived = await _stream.ReadAsync(buffer, 0, 4);
+
+            if (bytesReceived == 0)
+            {
+                _tcpClientServiceListener.CloseConnection();
+                return -1;
+            }
+
+            if (bytesReceived != 4)
+                return 0;
+
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(buffer);
+
+            return BitConverter.ToInt32(buffer, 0);
         }
 
         public async Task uploadFileFromSocket(string name)
