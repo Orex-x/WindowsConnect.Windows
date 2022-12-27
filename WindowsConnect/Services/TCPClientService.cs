@@ -15,15 +15,9 @@ namespace WindowsConnect.Services
     {
 
         private ITCPClientService _tcpClientServiceListener;
-
         private TcpClient _tcpClient;
         private NetworkStream _stream;
         private  TcpListener _listener;
-
-        private readonly Channel<string> _channel;
-
-
-        private readonly EndPoint _remoteEndPoint;
 
         #region Disposable
 
@@ -155,7 +149,7 @@ namespace WindowsConnect.Services
 
                                 string fileName = Encoding.UTF8.GetString(data);
 
-                                await uploadFileFromSocket("data\\" + fileName);
+                                await UploadFileFromSocket("data\\" + fileName);
                                 break;
                             case Command.CloseConnection:
                                 _tcpClientServiceListener.CloseConnection();
@@ -208,7 +202,7 @@ namespace WindowsConnect.Services
             return BitConverter.ToInt32(buffer, 0);
         }
 
-        public async Task uploadFileFromSocket(string name)
+        public async Task UploadFileFromSocket(string name)
         {
             await Task.Run(async () =>
             {
@@ -232,14 +226,13 @@ namespace WindowsConnect.Services
                         bytesReceived = await _stream.ReadAsync(buffer, 0, buffer.Length);
                         fstream.Write(buffer, 0, bytesReceived);
                         count += bytesReceived;
-                        int p = (int)getProgress(length, count);
-                        _tcpClientServiceListener.SetProgress(p);
+                        _tcpClientServiceListener.SetProgress((int)getProgress(length, count));
                         if (count > length) break;
 
                     }
                     while (count != length);
                 }
-                _tcpClientServiceListener.ResetProgress();
+                _tcpClientServiceListener.SetProgress(0);
             });
         }
 

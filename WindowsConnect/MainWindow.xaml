@@ -57,7 +57,7 @@
                 </Grid.ColumnDefinitions>
                 
                 <Button 
-                    Click="Button_Click_Open_Folder"
+                    Click="ButtonClickOpenFolder"
                     Margin="3"
                     Content="файлы"/>
 

@@ -41,6 +41,19 @@ namespace WindowsConnect
             base.OnClosed(e);
         }
 
+        public void CloseConnection()
+        {
+            _tcpClient.SendMessage(Command.CloseConnection);
+            _tcpClient.Dispose();
+            isConnect = false;
+            _tcpClient = new TCPClientService(this);
+
+            Dispatcher.Invoke(new Action(() =>
+            {
+                txtDeviceStatus.Text = "отключен";
+            }));
+        }
+
         public void SetVolume(int volume)
         {
             _volumeService.SetVolume(volume);
@@ -51,56 +64,46 @@ namespace WindowsConnect
         {
             Dispatcher.Invoke(new Action(() =>
             {
-                var d = _devices.FirstOrDefault(x => x.Name == device.Name);
+                var d = _devices.FirstOrDefault(x => x.IP == device.IP);
                 if(d != null)
                 {
-                    UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
-                    d.IP = device.IP;
-                    Database.Save(Database.DEVICE_PATH, _devices);
-                    var command = CommandHelper.CreateCommand(Command.OpenConnection, SettingsService.getHostInfo());
-                    var answer = UDPClientService.SendMessageWithReceive(command, device.IP);
-                    if(answer == "200")
-                    {
-                        txtDeviceName.Text = device.Name;
-                        txtDeviceStatus.Text = "подключен";
-                        sendWallpaper(device);
-                        isConnect = true;
-                    }
+                   ConnectDevice(d);
                 }
                 else
                 {
                     PlayStepasSound();
                     var result = MessageBox.Show($"Устройство {device.Name} запрашевает подключение.\n " +
                         $"Подключить данное устройство?", "Добавление устройства", MessageBoxButton.YesNo);
+
                     if (result == MessageBoxResult.Yes)
                     {
-                        UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
                         _devices.Add(device);
-                        Database.Save(Database.DEVICE_PATH, _devices);
-                        var command = CommandHelper.CreateCommand(Command.OpenConnection, SettingsService.getHostInfo());
-                        var answer = UDPClientService.SendMessageWithReceive(command, device.IP);
-                        if (answer == "200")
-                        {
-                            txtDeviceName.Text = device.Name;
-                            txtDeviceStatus.Text = "подключен";
-                            sendWallpaper(device);
-                            isConnect = true;
-                        }
-                        else
-                        {
-                            txtDeviceStatus.Text = "подключение не установлено (код 500)";
-                        }
+                        ConnectDevice(device);
                     }
                     else
-                    {
                         UDPClientService.SendMessage("500", device.IP, SettingsService.UDP_LISTEN_PORT);
-                    }
+                    
                 }
             }));
         }
 
+        public void ConnectDevice(Device device)
+        {
+            UDPClientService.SendMessage("200", device.IP, SettingsService.UDP_LISTEN_PORT);
+            Database.Save(Database.DEVICE_PATH, _devices);
+            var command = CommandHelper.CreateCommand(Command.OpenConnection, SettingsService.getHostInfo());
+            var answer = UDPClientService.SendMessageWithReceive(command, device.IP);
+            if (answer == "200")
+            {
+                txtDeviceName.Text = device.Name;
+                txtDeviceStatus.Text = "подключен";
+                SendWallpaper();
+                isConnect = true;
+            }
+        }
 
-        private async void sendWallpaper(Device device)
+
+        private async void SendWallpaper()
         {
             try
             {
@@ -155,14 +158,6 @@ namespace WindowsConnect
             }));
         }
 
-        public void ResetProgress()
-        {
-            Dispatcher.Invoke(new Action(() =>
-            {
-                pbStatus.Value = 0;
-            }));
-         
-        }
 
         public void SetProgress(int progress)
         {
@@ -177,18 +172,6 @@ namespace WindowsConnect
             MouseService.VirtualTouchPadChanged(x, y, action, pointer);
         }
 
-
-        public void CloseConnection()
-        {
-            _tcpClient.SendMessage(Command.CloseConnection);
-            _tcpClient.Dispose();
-            Dispatcher.Invoke(new Action(() =>
-            {
-                txtDeviceStatus.Text = "отключен";
-            }));
-            isConnect = false;
-            _tcpClient = new TCPClientService(this);
-        }
 
         public MainWindow()
         {
@@ -206,7 +189,7 @@ namespace WindowsConnect
             _tcpClient = new TCPClientService(this);
             _udpClient = new UDPClientService(this);
             imgQRCode.Source = QRCodeService.getQRCode();
-          //  _volumeService = new VolumeService();
+            _volumeService = new VolumeService();
             _keyboardService = new KeyboardService();
 
             _devices = Database.Get<List<Device>>(Database.DEVICE_PATH);
@@ -244,7 +227,7 @@ namespace WindowsConnect
         }
 
 
-        private void Button_Click_Open_Folder(object sender, RoutedEventArgs e)
+        private void ButtonClickOpenFolder(object sender, RoutedEventArgs e)
         {
             Process.Start("explorer", "data\\");
         }
@@ -261,8 +244,6 @@ namespace WindowsConnect
                 txtDeviceStatus.Text = "подключен";
             }));
         }
-
-
 
         public void DownKeyboardHardwareKeyPress(int code)
         {
