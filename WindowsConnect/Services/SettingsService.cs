@@ -56,7 +56,6 @@ namespace WindowsConnect.Services
 
                 if (IsAdapterPhysical(interf.Id.ToString()))
                 {
-     
                     //находим первый Unicast-адрес
                     foreach (var addr in unicast)
                     {
@@ -74,7 +73,6 @@ namespace WindowsConnect.Services
             var host = Dns.GetHostEntry(Dns.GetHostName());
 
             var ipAddress = GetIpAddress();
-           
 
             var json = new JObject();
             json["port"] = UDP_LISTEN_PORT;
