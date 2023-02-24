@@ -1,13 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using WindowsConnect.Interfaces;
-using WindowsConnect.Models;
 
 namespace WindowsConnect.Services
 {
@@ -78,11 +75,13 @@ namespace WindowsConnect.Services
         } 
 
 
-        public void SendMessage(byte[] data, int command, bool repeat)
+        public async Task SendMessageAsync(byte[] data, int command)
         {
-            do
+            if (_stream != null)
             {
-                if (_stream != null)
+                var nextDelay = TimeSpan.FromSeconds(1);
+
+                for (int i = 0; i != 3; ++i)
                 {
                     try
                     {
@@ -104,8 +103,11 @@ namespace WindowsConnect.Services
                     {
                         _tcpClientServiceListener.Exception(e);
                     }
+
+                    await Task.Delay(nextDelay);
+                    nextDelay += nextDelay;
                 }
-            } while (repeat); 
+            }
         }
 
         public void SendMessage(int command)

@@ -113,10 +113,9 @@ namespace WindowsConnect
                     "Microsoft\\Windows\\Themes\\TranscodedWallpaper");
 
                 byte[] bytes = File.ReadAllBytes(path);
-
-                await Task.Run(() => {
-                    _tcpClient.SendMessage(bytes, Command.SetWallpaper, true);
-                });
+                
+                _tcpClient.SendMessageAsync(bytes, Command.SetWallpaper);
+               
             }
             catch (Exception e)
             {
@@ -212,7 +211,7 @@ namespace WindowsConnect
                 if (Clipboard.ContainsText())
                 {
                     var text = Clipboard.GetText();
-                    _tcpClient.SendMessage(Encoding.UTF8.GetBytes(text), Command.SetTextClipBoard, false);
+                    _tcpClient.SendMessageAsync(Encoding.UTF8.GetBytes(text), Command.SetTextClipBoard);
                 }
 
                 if (Clipboard.ContainsImage())
